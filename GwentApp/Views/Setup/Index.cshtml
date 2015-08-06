@@ -1,0 +1,13 @@
+﻿@model GwentApp.Models.Player
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+@using (@Html.BeginForm())
+{
+    @Html.DropDownList("faction", GwentApp.Models.Player.FactionSelectListItems);
+}
+
+
