@@ -47,5 +47,14 @@ namespace GwentApp.Models
                 return listItems;
             }
         }
+
+        /// <summary>
+        /// This this the name that the player goes by within the game.
+        /// </summary>
+        public string LeaderName
+        {
+            get;
+            set;
+        }
     }
 }

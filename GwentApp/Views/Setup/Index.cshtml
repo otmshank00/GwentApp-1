@@ -5,9 +5,13 @@
 
 <h2>Index</h2>
 
-@using (@Html.BeginForm())
+@using (@Html.BeginForm("ProcessIndexForm", "Setup"))
 {
-    @Html.DropDownList("faction", GwentApp.Models.Player.FactionSelectListItems);
+    <label for="Faction">Pick a faction:</label>
+    @Html.DropDownList("Faction", GwentApp.Models.Player.FactionSelectListItems);<br />
+    <label for="LeaderName">Name your Leader:</label>
+    @Html.TextBox("LeaderName", "Conan the Barbarian");<br />
+    <input type="submit" value="Submit"/>
 }
 
 

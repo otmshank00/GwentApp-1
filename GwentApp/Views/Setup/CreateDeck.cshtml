@@ -1,0 +1,14 @@
+﻿@using GwentApp.Models;
+@model List<Card>
+@{
+    ViewBag.Title = "CreateDeck";
+}
+
+<h2>CreateDeck</h2>
+
+<ul>
+    @foreach (Card card in Model)
+    {
+        <li>@card.Name - @card.Power</li>
+    }
+</ul>
