@@ -1,0 +1,27 @@
+﻿@model GwentApp.Models.LoginModel
+
+@{
+    ViewBag.Title = "Sign In";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/Content/SignIn.css" type="text/css" />
+}
+<h1>Welcome to the GwentApp</h1>
+<h2>Please Sign In</h2>
+@using (@Html.BeginForm("SignIn", "Account", FormMethod.Post, new { Id = "signInForm" }))
+{
+    if (ViewBag.error_invalidCredentials == true)
+    {
+        <div class="errorText">The SacLink ID or password provided is invalid.</div>
+        <br />
+    }
+    @Html.LabelFor(m => m.UserName)<br />
+    @Html.TextBoxFor(m => m.UserName, new { Class = "signInField" })<br />
+    @Html.LabelFor(m => m.Password)<br />
+    @Html.PasswordFor(m => m.Password, new { Class = "signInField" })<br />
+    <input id="signInButton" type="submit" value="Sign In" /><br />
+    <div id="recoveryArea">
+        <a href="https://mysaclink.csus.edu">Forgot your SacLink ID<text>?</text></a><br />
+        <a href="https://password.csus.edu">Forgot your password<text>?</text></a>
+    </div>
+}
