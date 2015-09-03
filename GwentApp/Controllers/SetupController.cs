@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using GwentApp.Models;
+using Galactic.ActiveDirectory;
+using ADUser = Galactic.ActiveDirectory.User;
 
 namespace GwentApp.Controllers
 {
@@ -32,6 +34,15 @@ namespace GwentApp.Controllers
             };
 
             return View(deck);
+        }
+
+        public ActionResult PlayerInfo()
+        {
+            ActiveDirectory ad = GwentApp.Global.ad;
+
+            ADUser user = new ADUser(ad, ad.GetGUIDBySAMAccountName(User.Identity.Name));
+
+            return View(user);
         }
     }
 }

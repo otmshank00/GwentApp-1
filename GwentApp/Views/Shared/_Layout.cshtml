@@ -19,6 +19,15 @@
                     <span class="icon-bar"></span>
                 </button>
                 @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <div class="navbar-text pull-right">
+                    @if (!string.IsNullOrWhiteSpace(User.Identity.Name))
+                    {
+                        <span style="color: white;">
+                            @User.Identity.Name |
+                            @Html.ActionLink("Sign Out", "SignOut", "Account")
+                        </span>
+                    }
+                </div>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">

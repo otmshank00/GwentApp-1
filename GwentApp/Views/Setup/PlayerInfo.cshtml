@@ -1,0 +1,16 @@
+﻿@model Galactic.ActiveDirectory.User
+
+@{
+    ViewBag.Title = "PlayerInfo";
+}
+
+<h2>@Model.FirstName @Model.LastName</h2>
+
+Groups:
+<ul>
+    @foreach (string group in Model.Groups)
+    {
+        <li>@group</li>
+    }
+</ul>
+
