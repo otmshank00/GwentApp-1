@@ -67,11 +67,39 @@
       <HintPath>..\packages\Galactic.LDAP.1.2.0.67\lib\Galactic.LDAP.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Galactic.Sql, Version=1.2.0.67, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Galactic.Sql.1.2.0.67\lib\Galactic.Sql.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Galactic.Sql.MSSql, Version=1.2.0.67, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Galactic.Sql.MSSql.1.2.0.67\lib\Galactic.Sql.MSSql.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Galactic.Web.Security.SimpleMapping, Version=1.2.0.67, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Galactic.Web.Security.SimpleMapping.1.2.0.67\lib\Galactic.Web.Security.SimpleMapping.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.11.0.3000.0\lib\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Management.Sdk.Sfc, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.11.0.3000.0\lib\Microsoft.SqlServer.Management.Sdk.Sfc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Smo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.11.0.3000.0\lib\Microsoft.SqlServer.Smo.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SmoExtended, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.11.0.3000.0\lib\Microsoft.SqlServer.SmoExtended.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SqlEnum, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unofficial.Microsoft.SQLServer.SMO.11.0.3000.0\lib\Microsoft.SqlServer.SqlEnum.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.Protocols" />
     <Reference Include="System.Net.Http" />
@@ -129,6 +157,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\GwentCards.mdf" />
+    <Content Include="App_Data\GwentCards_log.ldf">
+      <DependentUpon>GwentCards.mdf</DependentUpon>
+    </Content>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\SignIn.css" />
@@ -139,6 +171,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ConfigurationItems\SimpleMappingRoleProvider.config" />
     <Content Include="ConfigurationItems\ActiveDirectory.config" />
+    <Content Include="ConfigurationItems\Db.config" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -179,9 +212,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

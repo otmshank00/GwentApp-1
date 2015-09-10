@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using GwentApp.Models;
 using Galactic.ActiveDirectory;
 using ADUser = Galactic.ActiveDirectory.User;
+using Galactic.Sql;
+using Galactic.Sql.MSSql;
 
 namespace GwentApp.Controllers
 {
@@ -26,12 +28,43 @@ namespace GwentApp.Controllers
 
         public ActionResult CreateDeck()
         {
-            List<Card> deck = new List<Card>() {
-                new Card() { Name = "Archer", Power = 1 },
-                new Card() { Name = "Catapult", Power = 10 },
-                new Card() { Name = "Bozo the Clown", Power = 3 },
-                new Card() { Name = "Will", Power = 99 }
-            };
+            // Create the empty deck object.
+            List<Card> deck = new List<Card>();
+
+            // Wrap SQL calls in a try / catch so that any exceptions are caught and handled.
+            try
+            {
+                // Create a utility to handle the SQL calls for this action.
+                MSSqlUtility sqlUtil = new MSSqlUtility();
+
+                // Execute a query to get the card values from the database.
+                List<SqlRow> rows = sqlUtil.ExecuteQuery("select * from dbo.Cards", Global.connectionString, null);
+
+                // Build the deck.
+
+                if (rows != null)
+                {
+                    foreach (SqlRow row in rows)
+                    {
+                        Card card = new Card();
+                        card.Name = (string)row["cardName"];
+                        card.Power = (int)row["cardPower"];
+                        deck.Add(card);
+                    }
+                }
+
+                // This is our original manual way of creating the deck.
+                /*List<Card> deck = new List<Card>() {
+                    new Card() { Name = "Archer", Power = 1 },
+                    new Card() { Name = "Catapult", Power = 10 },
+                    new Card() { Name = "Bozo the Clown", Power = 3 },
+                    new Card() { Name = "Will", Power = 99 }
+                };*/
+            }
+            catch
+            {
+                // We're not going to do anything on an exception, we'll just return the empty deck initialized above.
+            }
 
             return View(deck);
         }

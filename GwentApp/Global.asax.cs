@@ -9,6 +9,8 @@ using System.Web.Security;
 using System.Web.SessionState;
 using System.Web.Http;
 using Galactic.ActiveDirectory;
+using Galactic.Configuration;
+using Galactic.Sql.MSSql;
 
 namespace GwentApp
 {
@@ -20,8 +22,12 @@ namespace GwentApp
         // The name of the configuration item that conatins the information required to connect to Active Directory.
         private const string ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME = "ActiveDirectory";
 
+        // The name of the configuration item that conatins the information required to connect to the Gwent database.
+        private const string DB_CONFIGURATION_ITEM_NAME = "Db";
+
         // Global objects application objects.
         public static ActiveDirectory ad;
+        public static string connectionString;
 
         void Application_Start(object sender, EventArgs e)
         {
@@ -31,7 +37,11 @@ namespace GwentApp
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
             // Setup an AD client.
-            ad = new ActiveDirectory(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME);         
+            ad = new ActiveDirectory(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME);
+
+            // Get our SQL connection string.
+            ConfigurationItem sqlConfig = new ConfigurationItem(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), DB_CONFIGURATION_ITEM_NAME, true);
+            connectionString = sqlConfig.Value;
         }
     }
 }
