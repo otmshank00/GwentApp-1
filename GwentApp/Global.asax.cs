@@ -11,6 +11,7 @@ using System.Web.Http;
 using Galactic.ActiveDirectory;
 using Galactic.Configuration;
 using Galactic.Sql.MSSql;
+using GwentApp.Models;
 
 namespace GwentApp
 {
@@ -28,7 +29,8 @@ namespace GwentApp
         // Global objects application objects.
         public static ActiveDirectory ad;
         public static string connectionString;
-
+        public static Player player = new Player();
+        
         void Application_Start(object sender, EventArgs e)
         {
             // Code that runs on application startup

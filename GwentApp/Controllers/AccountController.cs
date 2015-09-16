@@ -27,6 +27,7 @@ namespace GwentApp.Controllers
             if (ModelState.IsValid)
             {
                 if (Membership.ValidateUser(model.UserName, model.Password))
+                //if (true)
                 {
                     // The user's credentials are valid.
                     FormsAuthentication.SetAuthCookie(model.UserName, false);

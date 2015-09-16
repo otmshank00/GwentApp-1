@@ -3,58 +3,51 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Collections.ObjectModel;
+using System.Text;
 
 namespace GwentApp.Models
 {
-
+    public class factionInfo
+    {
+        public string factionName { get; set; }
+        public string factionAbbr { get; set; }
+        public string factionPerk { get; set; }
+    }
+    public class leaderInfo
+    {
+        public string leaderName { get; set; }
+        public string leaderAbility { get; set; }
+        public string leaderFaction { get; set; }
+        public string leaderFactionAbbr { get; set; }
+    }
+    public class playerChoices
+    {
+        public static List<factionInfo> factionList { get; set; }
+        public static List<leaderInfo> leaderList { get; set; }
+        public static List<SelectListItem> ddFactionList { get; set; }
+        public static List<SelectListItem> ddLeaderList { get; set; }
+        public factionInfo selectedFaction { get; set; }
+        public leaderInfo selectedLeader { get; set; }
+    }
     public class Player
     {
         /// <summary>
         /// The player's Faction choice within the game.
         /// </summary>
-        public string Faction
+
+        public factionInfo faction
         {
-            get;
-            set;
+            get; set;
         }
 
-        /// <summary>
-        /// A list of Faction SelectListItems that can be displayed in the View.
-        /// </summary>
-        public static List<SelectListItem> FactionSelectListItems
+        public leaderInfo leader
         {
-            get
-            {
-                // Create a list of SelectListItems to populate.
-                List<SelectListItem> listItems = new List<SelectListItem>();
-
-                // Create list items called "Faction#" for the number of factions in the game.
-                for (int i = 1; i < 5; i++)
-                {
-                    // Create a list item.
-                    SelectListItem item = new SelectListItem();
-
-                    // Give it a name and populate it's value and text representation.
-                    string name = "Faction" + i;
-                    item.Value = name;
-                    item.Text = name;
-
-                    // Add the item to the list.
-                    listItems.Add(item);
-                }
-
-                // Return the populated list.
-                return listItems;
-            }
+            get; set;
         }
-
-        /// <summary>
-        /// This this the name that the player goes by within the game.
-        /// </summary>
-        public string LeaderName
+        public List<Card> deck
         {
-            get;
-            set;
+            get; set;
         }
     }
 }

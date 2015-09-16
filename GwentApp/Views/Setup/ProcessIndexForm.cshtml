@@ -1,9 +1,26 @@
-﻿@model GwentApp.Models.Player
+﻿@using GwentApp.Models;
+@model GwentApp.Models.Player
 @{
-    ViewBag.Title = "ProcessIndexFormView";
+    ViewBag.Title = "ProcessIndexForm";
 }
 
 <h2>ProcessIndexFormView</h2>
-
-@Model.Faction
-@Model.LeaderName
+<li>
+    @Model.faction.factionName
+</li>
+<li>
+    @Model.faction.factionAbbr
+</li>
+<li>
+    @Model.leader.leaderName
+</li>
+<li>
+    @Model.leader.leaderFaction
+</li>
+<li>
+    @Model.leader.leaderAbility
+</li>
+@using (@Html.BeginForm("CreateDeck", "Setup"))
+{
+<input type="submit" value="Create Deck" />
+}
