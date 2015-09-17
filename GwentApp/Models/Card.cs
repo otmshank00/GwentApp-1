@@ -24,5 +24,36 @@ namespace GwentApp.Models
             get;
             set;
         }
+
+        //Card Faction
+        public string Faction
+        {
+            get;
+            set;
+        }
+
+        //Card Range
+        public string Range
+        {
+            get; set;
+        }
+
+        //Card Quote
+        public string Quote
+        {
+            get; set;
+        }
+
+        //Is Hero?
+        public bool Hero
+        {
+            get; set;
+        }
+
+        //Card Ability
+        public string Ability
+        {
+            get; set;
+        }
     }
 }

@@ -1,14 +1,56 @@
 ﻿@using GwentApp.Models;
-@model List<Card>
+@model Player
 @{
     ViewBag.Title = "CreateDeck";
 }
 
 <h2>CreateDeck</h2>
-
-<ul>
-    @foreach (Card card in Model)
+<li>@Global.player.faction.factionName</li>
+<li>@Global.player.faction.factionAbbr</li>
+<li>@Global.player.leader.leaderName</li>
+<li>@Global.player.leader.leaderFactionAbbr</li>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Name")
+        </th>
+        <th>
+            @Html.DisplayName("Range")
+        </th>
+        <th>
+            @Html.DisplayName("Power")
+        </th>
+        <th>
+            @Html.DisplayName("Ability")
+        </th>
+        <th>
+            @Html.DisplayName("Faction")
+        </th>
+        <th>
+            @Html.DisplayName("Hero")
+        </th>
+    </tr>
+    @foreach (Card c in Model.deck)
     {
-        <li>@card.Name - @card.Power</li>
+        <tr style="@(c.Hero ? " background-color:#C27E3A" : "")">
+            <td>
+                @Html.DisplayFor(x => c.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(x => c.Range)
+            </td>
+            <td style="color:red">
+                @Html.DisplayFor(x => c.Power)
+            </td>
+            <td>
+                @Html.DisplayFor(x => c.Ability)
+            </td>
+            <td>
+                @Html.DisplayFor(x => c.Faction)
+            </td>
+            <td>
+                @Html.DisplayFor(x => c.Hero)
+            </td>
+        </tr>
     }
-</ul>
+</table>
