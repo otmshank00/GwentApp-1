@@ -1,50 +1,37 @@
 ﻿@using GwentApp.Models
-@model GwentApp.Models.playerChoices
+@model GwentApp.Models.Player
+
 @{
     ViewBag.Title = "Index";
+    string color = "";
 }
 
-<h2>Index</h2>
+<h2>Select A Faction</h2>
 
-@using (@Html.BeginForm("CreateDeck", "Setup"))
+@using (@Html.BeginForm("ProcessIndexForm", "Setup"))
 {
     <table class="table">
-        @foreach (factionInfo faction in playerChoices.factionList)
+        @foreach (factionInfo faction in Player.factionList)
         {
+            //switch (faction.factionName)
+            //{
+            //    case "Monsters":
+            //        color = "font-color:red";
+            //        break;
 
+            //}
             <tr>
-                <th>@Html.Label(faction.factionName) | @Html.Label(faction.factionAbbr)</th>
-            </tr>
-            <tr>
-                <td style="font-style:italic">
+                <th style=@color>@Html.Label(faction.factionName)</th>
+                <td style="font-style:italic;@color">
                     @Html.Label(faction.factionPerk)
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <ul>
-                       @foreach (leaderInfo leader in playerChoices.leaderList)
-                       {
-                        @*<li style="@(leader.leaderFactionAbbr == faction.factionAbbr ? " background-color:#C27E3A" : "")">*@
-                            @*if (leader.leaderFactionAbbr == faction.factionAbbr)
-                            {
-                               <li>
-                                   @Html.Label(leader.leaderName) | @Html.Label(leader.leaderAbility)
-                                   
-                               </li>
-                            }*@
-                       }
-                        @Html.DropDownListFor((m => m.selectedLeader.leaderName), playerChoices.ddLeaderList.FindAll(i => i.Value == faction.factionAbbr).Select(x => new SelectListItem { Value = x.Text, Text = x.Text }).ToList(), "")
-                    </ul>
-                </td>
-            </tr>
+            
         }
     </table>
-    @*@Html.LabelFor(m => m.selectedFaction.factionName, "Pick a faction:");
-    @Html.DropDownListFor(m => m.selectedFaction.factionName, Model.ddFactionList,"");<br />
+    @*@Html.LabelFor(m => m.selectedFaction.factionName, "Pick a faction:");*@
+    @Html.DropDownListFor(m => m.selectedFaction.factionName, Player.ddFactionList,"");
 
-    @Html.LabelFor(m => m.selectedLeader.leaderName, "Select your leader:");
-    @Html.DropDownListFor((m => m.selectedLeader.leaderName), Model.ddLeaderList, "");<br />*@
     <input type="submit" value="Submit"/>
 }
 

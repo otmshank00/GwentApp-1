@@ -10,6 +10,12 @@ using Galactic.Sql;
 using Galactic.Sql.MSSql;
 using System.Diagnostics;
 
+
+/// <summary>
+/// 
+/// Remove the global player and create an uber model with all in it. Fly that around. Globals are global across the entire app, all sessions
+/// </summary>
+
 namespace GwentApp.Controllers
 {
     public class SetupController : Controller
@@ -17,13 +23,11 @@ namespace GwentApp.Controllers
         // GET: Setup/Index
         public ActionResult Index()
         {
-            playerChoices choices = new playerChoices();
-            playerChoices.factionList = new List<factionInfo>();
-            playerChoices.leaderList = new List<leaderInfo>();
-            playerChoices.ddFactionList = new List<SelectListItem>();
-            playerChoices.ddLeaderList = new List<SelectListItem>();
-            Global.player.faction = new factionInfo();
-            Global.player.leader = new leaderInfo();
+            Player player = new Player();
+            Player.factionList = new List<factionInfo>();
+            Player.leaderList = new List<leaderInfo>();
+            Player.ddFactionList = new List<SelectListItem>();
+            Player.ddLeaderList = new List<SelectListItem>();
             try
             {
                 MSSqlUtility sqlUtil = new MSSqlUtility();
@@ -37,10 +41,12 @@ namespace GwentApp.Controllers
                         faction.factionName = ((string)row["factionName"]).Trim();
                         faction.factionAbbr = ((string)row["factionAbbreviation"]).Trim();
                         faction.factionPerk = ((string)row["factionPerk"]).Trim();
-                        playerChoices.factionList.Add(faction);
+                        //playerChoices.factionList.Add(faction);
+                        Player.factionList.Add(faction);
                         item.Text = faction.factionName;
                         item.Value = faction.factionAbbr;
-                        playerChoices.ddFactionList.Add(item);
+                        //playerChoices.ddFactionList.Add(item);
+                        Player.ddFactionList.Add(item);
                     }
                 }
                 rows = new List<SqlRow>();
@@ -55,10 +61,12 @@ namespace GwentApp.Controllers
                         leader.leaderAbility = ((string)row["leaderAbility"]).Trim();
                         leader.leaderFaction = ((string)row["leaderFaction"]).Trim();
                         leader.leaderFactionAbbr = ((string)row["leaderFactionAbbreviation"]);
-                        playerChoices.leaderList.Add(leader);
+                        //playerChoices.leaderList.Add(leader);
+                        Player.leaderList.Add(leader);
                         item.Text = leader.leaderName;
                         item.Value = leader.leaderFactionAbbr;
-                        playerChoices.ddLeaderList.Add(item);
+                        //playerChoices.ddLeaderList.Add(item);
+                        Player.ddLeaderList.Add(item);
                     }
                 }
             }
@@ -66,22 +74,25 @@ namespace GwentApp.Controllers
             {
 
             }
-            return View(choices);
-        }
-
-        
-        public ActionResult ProcessIndexForm(playerChoices choices)
-        {
-            
-            return View(Global.player);
+            return View(player);
         }
 
         [HttpPost]
-        public ActionResult CreateDeck(playerChoices choices)
+        public ActionResult ProcessIndexForm(Player player)
+        {
+
+            
+            return View(player);
+        }
+
+        [HttpPost]
+        public ActionResult CreateDeck(Player player)
         {
             // Create the empty deck object.
             //List<Card> deck = new List<Card>();
-            Global.player.deck = new List<Card>();
+            player.deck = new List<Card>();
+            player.faction = new factionInfo();
+            player.leader = new leaderInfo();
             //define deck constants
             const int STARTING_DECK_SIZE = 10;
             const int MAX_DECK_SIZE = 28;
@@ -91,21 +102,15 @@ namespace GwentApp.Controllers
             const int MAX_N_SPECIALS = 3;
             const int MAX_F_HEROES = 3;
             const int MAX_F_UNITS = 12;
-            Global.player.leader.leaderName = choices.selectedLeader.leaderName;
+            player.leader.leaderName = player.selectedLeader.leaderName;
             //sort out faction
-            //string factionAbbreviation = choices.selectedFaction.factionAbbr;
-            //Global.player.leader.leaderFactionAbbr = choices.selectedLeader.leaderFactionAbbr;
-            //Global.player.faction.factionAbbr = choices.selectedFaction.factionName;
-            //choices.selectedFaction.factionAbbr = choices.selectedFaction.factionName;
-
-
             ///
             //new block
             ///
-            Global.player.leader.leaderFactionAbbr = playerChoices.ddLeaderList.Find(i => i.Text == choices.selectedLeader.leaderName).Value;
-            Global.player.faction.factionAbbr = Global.player.leader.leaderFactionAbbr;
-            Global.player.faction.factionName = playerChoices.ddFactionList.Find(i => i.Value == Global.player.faction.factionAbbr).Text;
-            string factionAbbreviation = Global.player.faction.factionAbbr;
+            player.leader.leaderFactionAbbr = Player.ddLeaderList.Find(i => i.Text == player.selectedLeader.leaderName).Value;
+            player.faction.factionAbbr = player.leader.leaderFactionAbbr;
+            player.faction.factionName = Player.ddFactionList.Find(i => i.Value == player.faction.factionAbbr).Text;
+            string factionAbbreviation = player.faction.factionAbbr;
 
 
 
@@ -227,10 +232,10 @@ namespace GwentApp.Controllers
                         }
                         catch { }
 
-                        Global.player.deck.Add(card);
+                        player.deck.Add(card);
                     }
                 }
-                Global.player.deck.Sort((x, y) => string.Compare(x.Range, y.Range));
+                player.deck.Sort((x, y) => string.Compare(x.Range, y.Range));
                 // This is our original manual way of creating the deck.
                 /*List<Card> deck = new List<Card>() {
                     new Card() { Name = "Archer", Power = 1 },
@@ -244,7 +249,7 @@ namespace GwentApp.Controllers
                 // We're not going to do anything on an exception, we'll just return the empty deck initialized above.
             }
 
-            return View(Global.player);
+            return View(player);
         }
 
         public ActionResult PlayerInfo()

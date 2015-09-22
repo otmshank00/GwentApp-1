@@ -29,7 +29,7 @@ namespace GwentApp
         // Global objects application objects.
         public static ActiveDirectory ad;
         public static string connectionString;
-        public static Player player = new Player();
+        //public static Player player = new Player();
         
         void Application_Start(object sender, EventArgs e)
         {

@@ -4,23 +4,23 @@
     ViewBag.Title = "ProcessIndexForm";
 }
 
-<h2>ProcessIndexFormView</h2>
-<li>
-    @Model.faction.factionName
-</li>
-<li>
-    @Model.faction.factionAbbr
-</li>
-<li>
-    @Model.leader.leaderName
-</li>
-<li>
-    @Model.leader.leaderFaction
-</li>
-<li>
-    @Model.leader.leaderAbility
-</li>
+<h2>Select A Leader</h2>
 @using (@Html.BeginForm("CreateDeck", "Setup"))
 {
-<input type="submit" value="Create Deck" />
+    <table class="table">
+        @foreach (leaderInfo leader in Player.leaderList)
+        {
+            if (leader.leaderFactionAbbr == Model.selectedFaction.factionName)
+            {
+                <tr>
+                    <th>@Html.Label(leader.leaderName)</th>
+                    <td style="font-style:italic">
+                        @Html.Label(leader.leaderAbility)
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+    @Html.DropDownListFor((m => m.selectedLeader.leaderName), Player.ddLeaderList.FindAll(i => i.Value == Model.selectedFaction.factionName).Select(x => new SelectListItem { Value = x.Text, Text = x.Text }).ToList(), "")
+    <input type="submit" value="Create Deck" />
 }
