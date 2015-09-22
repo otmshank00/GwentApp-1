@@ -21,19 +21,20 @@ namespace GwentApp.Models
         public string leaderFaction { get; set; }
         public string leaderFactionAbbr { get; set; }
     }
-    public class playerChoices
-    {
-        public static List<factionInfo> factionList { get; set; }
-        public static List<leaderInfo> leaderList { get; set; }
-        public static List<SelectListItem> ddFactionList { get; set; }
-        public static List<SelectListItem> ddLeaderList { get; set; }
-        public factionInfo selectedFaction { get; set; }
-        public leaderInfo selectedLeader { get; set; }
-    }
+    //public class playerChoices
+    //{
+    //    public static List<factionInfo> factionList { get; set; }
+    //    public static List<leaderInfo> leaderList { get; set; }
+    //    public static List<SelectListItem> ddFactionList { get; set; }
+    //    public static List<SelectListItem> ddLeaderList { get; set; }
+    //    public factionInfo selectedFaction { get; set; }
+    //    public leaderInfo selectedLeader { get; set; }
+    //}
+    //
     public class Player
     {
         /// <summary>
-        /// The player's Faction choice within the game.
+        /// The player's complete uber model.
         /// </summary>
 
         public factionInfo faction
@@ -49,5 +50,11 @@ namespace GwentApp.Models
         {
             get; set;
         }
+        public static List<factionInfo> factionList { get; set; }
+        public static List<leaderInfo> leaderList { get; set; }
+        public static List<SelectListItem> ddFactionList { get; set; }
+        public static List<SelectListItem> ddLeaderList { get; set; }
+        public factionInfo selectedFaction { get; set; }
+        public leaderInfo selectedLeader { get; set; }
     }
 }
