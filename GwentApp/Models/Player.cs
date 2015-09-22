@@ -30,6 +30,7 @@ namespace GwentApp.Models
     //    public factionInfo selectedFaction { get; set; }
     //    public leaderInfo selectedLeader { get; set; }
     //}
+    //
     public class Player
     {
         /// <summary>
