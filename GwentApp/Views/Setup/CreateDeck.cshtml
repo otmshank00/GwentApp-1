@@ -3,12 +3,12 @@
 @{
     ViewBag.Title = "CreateDeck";
 }
-
+@*Create a simple list items block to display what we got from the selected leader and faction*@
 <h2>CreateDeck</h2>
-<li>@Model.faction.factionName</li>
-<li>@Model.faction.factionAbbr</li>
-<li>@Model.leader.leaderName</li>
-<li>@Model.leader.leaderFactionAbbr</li>
+<li>@Model.Faction.FactionName</li>
+<li>@Model.Faction.FactionAbbr</li>
+<li>@Model.Leader.LeaderName</li>
+<li>@Model.Leader.LeaderFactionAbbr</li>
 <table class="table">
     <tr>
         <th>
@@ -30,8 +30,11 @@
             @Html.DisplayName("Hero")
         </th>
     </tr>
-    @foreach (Card c in Model.deck)
+    @*Loop through the completed card deck to show what's there.
+    I still need to pare down to STARTING_DECK_SIZE but that's later*@
+    @foreach (Card c in Model.Deck)
     {
+        //Nifty bit of conditional formatting here. If the card is a hero then the table row is gold.
         <tr style="@(c.Hero ? " background-color:#C27E3A" : "")">
             <td>
                 @Html.DisplayFor(x => c.Name)

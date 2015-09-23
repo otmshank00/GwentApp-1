@@ -7,20 +7,23 @@
 <h2>Select A Leader</h2>
 @using (@Html.BeginForm("CreateDeck", "Setup"))
 {
+    @*Loop the leaders and show each one*@
     <table class="table">
-        @foreach (leaderInfo leader in Player.leaderList)
+        @foreach (LeaderInfo leader in Player.LeaderList)
         {
-            if (leader.leaderFactionAbbr == Model.selectedFaction.factionName)
+            //If the available leaders faction abbreviation matches our selected faction abbreviation then show it in the table
+            if (leader.LeaderFactionAbbr == Model.SelectedFaction.FactionName)
             {
                 <tr>
-                    <th>@Html.Label(leader.leaderName)</th>
+                    <th>@Html.Label(leader.LeaderName)</th>
                     <td style="font-style:italic">
-                        @Html.Label(leader.leaderAbility)
+                        @Html.Label(leader.LeaderAbility)
                     </td>
                 </tr>
             }
         }
     </table>
-    @Html.DropDownListFor((m => m.selectedLeader.leaderName), Player.ddLeaderList.FindAll(i => i.Value == Model.selectedFaction.factionName).Select(x => new SelectListItem { Value = x.Text, Text = x.Text }).ToList(), "")
+    //This query only shows the leaders in the drop down list who belong to our selected faction. It then builds a new select list based on that value (the X portion)
+    @Html.DropDownListFor((m => m.SelectedLeader.LeaderName), Player.DdLeaderList.FindAll(i => i.Value == Model.SelectedFaction.FactionName).Select(x => new SelectListItem { Value = x.Text, Text = x.Text }).ToList(), "")
     <input type="submit" value="Create Deck" />
 }

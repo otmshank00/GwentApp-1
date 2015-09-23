@@ -10,12 +10,6 @@ using Galactic.Sql;
 using Galactic.Sql.MSSql;
 using System.Diagnostics;
 
-
-/// <summary>
-/// 
-/// Remove the global player and create an uber model with all in it. Fly that around. Globals are global across the entire app, all sessions
-/// </summary>
-
 namespace GwentApp.Controllers
 {
     public class SetupController : Controller
@@ -23,56 +17,68 @@ namespace GwentApp.Controllers
         // GET: Setup/Index
         public ActionResult Index()
         {
+            //Initialize objects
             Player player = new Player();
-            Player.factionList = new List<factionInfo>();
-            Player.leaderList = new List<leaderInfo>();
-            Player.ddFactionList = new List<SelectListItem>();
-            Player.ddLeaderList = new List<SelectListItem>();
+            Player.FactionList = new List<FactionInfo>();
+            Player.LeaderList = new List<LeaderInfo>();
+            Player.DdFactionList = new List<SelectListItem>();
+            Player.DdLeaderList = new List<SelectListItem>();
+
+            //Define SQL query constants
+            const string SELECT_ALL_FACTIONS = "select * from dbo.Factions";
+            const string SELECT_ALL_LEADERS = "select * from dbo.Leaders";
+
             try
             {
+                // Create a utility to handle the SQL calls for this action.
                 MSSqlUtility sqlUtil = new MSSqlUtility();
-                List<SqlRow> rows = sqlUtil.ExecuteQuery("select * from dbo.Factions", Global.connectionString, null);
+
+                List<SqlRow> rows = sqlUtil.ExecuteQuery(SELECT_ALL_FACTIONS, Global.connectionString, null);
                 if (rows != null)
                 {
                     foreach (SqlRow row in rows)
                     {
-                        factionInfo faction = new factionInfo();
+                        //Assign the returned database values into the object
+                        FactionInfo faction = new FactionInfo();
                         SelectListItem item = new SelectListItem();
-                        faction.factionName = ((string)row["factionName"]).Trim();
-                        faction.factionAbbr = ((string)row["factionAbbreviation"]).Trim();
-                        faction.factionPerk = ((string)row["factionPerk"]).Trim();
-                        //playerChoices.factionList.Add(faction);
-                        Player.factionList.Add(faction);
-                        item.Text = faction.factionName;
-                        item.Value = faction.factionAbbr;
-                        //playerChoices.ddFactionList.Add(item);
-                        Player.ddFactionList.Add(item);
+                        faction.FactionName = ((string)row["factionName"]).Trim();
+                        faction.FactionAbbr = ((string)row["factionAbbreviation"]).Trim();
+                        faction.FactionPerk = ((string)row["factionPerk"]).Trim();
+                        Player.FactionList.Add(faction);
+
+                        //Add the drop down list item. Note that the TEXT property is not passed, only the VALUE. This causes pain.
+                        item.Text = faction.FactionName;
+                        item.Value = faction.FactionAbbr;
+                        Player.DdFactionList.Add(item);
                     }
                 }
+                //Reinitialize the rows list.
                 rows = new List<SqlRow>();
-                rows = sqlUtil.ExecuteQuery("select * from dbo.Leaders", Global.connectionString, null);
+                rows = sqlUtil.ExecuteQuery(SELECT_ALL_LEADERS, Global.connectionString, null);
+
                 if (rows != null)
                 {
                     foreach (SqlRow row in rows)
                     {
-                        leaderInfo leader = new leaderInfo();
+                        //Assign the returned database values into the object
+                        LeaderInfo leader = new LeaderInfo();
                         SelectListItem item = new SelectListItem();
-                        leader.leaderName = ((string)row["leaderName"]).Trim();
-                        leader.leaderAbility = ((string)row["leaderAbility"]).Trim();
-                        leader.leaderFaction = ((string)row["leaderFaction"]).Trim();
-                        leader.leaderFactionAbbr = ((string)row["leaderFactionAbbreviation"]);
-                        //playerChoices.leaderList.Add(leader);
-                        Player.leaderList.Add(leader);
-                        item.Text = leader.leaderName;
-                        item.Value = leader.leaderFactionAbbr;
-                        //playerChoices.ddLeaderList.Add(item);
-                        Player.ddLeaderList.Add(item);
+                        leader.LeaderName = ((string)row["leaderName"]).Trim();
+                        leader.LeaderAbility = ((string)row["leaderAbility"]).Trim();
+                        leader.LeaderFaction = ((string)row["leaderFaction"]).Trim();
+                        leader.LeaderFactionAbbr = ((string)row["leaderFactionAbbreviation"]);
+                        Player.LeaderList.Add(leader);
+
+                        //Add the drop down list item. Note that the TEXT property is not passed, only the VALUE. This causes pain.
+                        item.Text = leader.LeaderName;
+                        item.Value = leader.LeaderFactionAbbr;
+                        Player.DdLeaderList.Add(item);
                     }
                 }
             }
             catch
             {
-
+                //Do we need to perform an action on catch?
             }
             return View(player);
         }
@@ -88,29 +94,56 @@ namespace GwentApp.Controllers
         [HttpPost]
         public ActionResult CreateDeck(Player player)
         {
-            // Create the empty deck object.
-            //List<Card> deck = new List<Card>();
-            player.deck = new List<Card>();
-            player.faction = new factionInfo();
-            player.leader = new leaderInfo();
-            //define deck constants
+            // Create the empty deck object, faction object and leader object.
+            player.Deck = new List<Card>();
+            player.Faction = new FactionInfo();
+            player.Leader = new LeaderInfo();
+
+            //Sort out the selected leader and faction from the model. This was harder than it should have been.
+            //Assign the selected leader name to the player.Leader
+            player.Leader.LeaderName = player.SelectedLeader.LeaderName;
+            //Since the drop down list only sends the value (and not the text) I have to query the list to determine what faction abbreviation the selected leader belongs to
+            player.Leader.LeaderFactionAbbr = Player.DdLeaderList.Find(i => i.Text == player.SelectedLeader.LeaderName).Value;
+            //Assign the selected faction abbreviation to the player.Leader
+            player.Faction.FactionAbbr = player.Leader.LeaderFactionAbbr;
+            //Since the drop down list only sends the value (and not the text) I have to query the list to determine what faction name the selected leader belongs to
+            player.Faction.FactionName = Player.DdFactionList.Find(i => i.Value == player.Faction.FactionAbbr).Text;
+            //This is a place holder of the faction abbreviation used in the SQL queries.
+            string factionAbbreviation = player.Faction.FactionAbbr;
+
+            //Define deck constants
+            //Final count of cards dealt to player from initialized deck
             const int STARTING_DECK_SIZE = 10;
+            //Max size of initialized deck
             const int MAX_DECK_SIZE = 28;
+            //Max number of weather cards to be dealt
             const int MAX_WEATHER_CARDS = 4;
+            //Max number of neutral unit cards to be dealt
             const int MAX_N_UNITS = 3;
+            //Max number of neutral hero cards to be dealt
             const int MAX_N_HEROES = 3;
+            //Max number of neutral special cards to be dealt
             const int MAX_N_SPECIALS = 3;
+            //Max number of faction hero cards to be dealt
             const int MAX_F_HEROES = 3;
+            //Max number of faction unit cards to be dealt
             const int MAX_F_UNITS = 12;
-            player.leader.leaderName = player.selectedLeader.leaderName;
-            //sort out faction
-            ///
-            //new block
-            ///
-            player.leader.leaderFactionAbbr = Player.ddLeaderList.Find(i => i.Text == player.selectedLeader.leaderName).Value;
-            player.faction.factionAbbr = player.leader.leaderFactionAbbr;
-            player.faction.factionName = Player.ddFactionList.Find(i => i.Value == player.faction.factionAbbr).Text;
-            string factionAbbreviation = player.faction.factionAbbr;
+
+            //Define SQL query constants. These work off of existing views in the database.
+            //Get all weather cards
+            const string SELECT_ALL_WEATHER_CARDS = "select * from AllWeather";
+            //Get all neutral unit cards
+            const string SELECT_ALL_N_UNITS = "select * from AllNeutralUnits";
+            //Get all neutral hero cards
+            const string SELECT_ALL_N_HEROS = "select * from AllNeutralHeros";
+            //Get all neutral special cards
+            const string SELECT_ALL_N_SPECIALS = "select * from AllNeutralSpecial";
+
+
+            //Get all selected faction hero cards. Can't be a const because of the abbreviation trick
+            string selectAllFHeros = "select * from All" + factionAbbreviation + "Heros";
+            //Get all selected faction unit cards. Can't be a const because of the abbreviation trick
+            string selectAllFUnits = "select * from All" + factionAbbreviation + "Units";
 
 
 
@@ -119,16 +152,19 @@ namespace GwentApp.Controllers
             {
                 // Create a utility to handle the SQL calls for this action.
                 MSSqlUtility sqlUtil = new MSSqlUtility();
-                
-                // Execute a query to get the card values from the database.
+
+                //Create an empty row list to be used as the deck holder
                 List<SqlRow> rows = new List<SqlRow>();
-                List<SqlRow> weatherRows = sqlUtil.ExecuteQuery("select * from AllWeather", Global.connectionString, null);
-                List<SqlRow> neutralUnitsRows = sqlUtil.ExecuteQuery("select * from AllNeutralUnits", Global.connectionString, null);
-                List<SqlRow> neutralHeroUnitsRows = sqlUtil.ExecuteQuery("select * from AllNeutralHeros", Global.connectionString, null);
-                List<SqlRow> neutralSpecialUnitsRows = sqlUtil.ExecuteQuery("select * from AllNeutralSpecial", Global.connectionString, null);
-                List<SqlRow> allFactionHeroesRows = sqlUtil.ExecuteQuery("select * from All" + factionAbbreviation + "Heros", Global.connectionString, null);
-                List<SqlRow> allFactionUnitsRows = sqlUtil.ExecuteQuery("select * from All" + factionAbbreviation + "Units", Global.connectionString, null);
-                //shuffle the deck and remove cards
+                
+                // Execute queries to get the card values from the database.
+                List<SqlRow> weatherRows = sqlUtil.ExecuteQuery(SELECT_ALL_WEATHER_CARDS, Global.connectionString, null);
+                List<SqlRow> neutralUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_N_UNITS, Global.connectionString, null);
+                List<SqlRow> neutralHeroUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_N_HEROS, Global.connectionString, null);
+                List<SqlRow> neutralSpecialUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_N_SPECIALS, Global.connectionString, null);
+                List<SqlRow> allFactionHeroesRows = sqlUtil.ExecuteQuery(selectAllFHeros, Global.connectionString, null);
+                List<SqlRow> allFactionUnitsRows = sqlUtil.ExecuteQuery(selectAllFUnits, Global.connectionString, null);
+                
+                //Shuffle the deck and remove a random card until our row count meets the defined max constant
                 if (weatherRows != null)
                 {
                     while (weatherRows.Count > MAX_WEATHER_CARDS)
@@ -183,13 +219,17 @@ namespace GwentApp.Controllers
                         allFactionUnitsRows.RemoveAt(rand);
                     }
                 }
+
+                //Add the pared down cards to our deck holder, rows
                 rows.AddRange(weatherRows);
                 rows.AddRange(neutralUnitsRows);
                 rows.AddRange(neutralHeroUnitsRows);
                 rows.AddRange(neutralSpecialUnitsRows);
                 rows.AddRange(allFactionHeroesRows);
                 rows.AddRange(allFactionUnitsRows);
-                // Build the deck.
+
+                //Build the deck by assigning the attributes from the database into the object attributes.
+                //The TRY/CATCH is there to handle potential null values because C# null is not the same as DBNULL 
                 if (rows != null)
                 {
                     foreach (SqlRow row in rows)
@@ -232,17 +272,13 @@ namespace GwentApp.Controllers
                         }
                         catch { }
 
-                        player.deck.Add(card);
+                        player.Deck.Add(card);
                     }
                 }
-                player.deck.Sort((x, y) => string.Compare(x.Range, y.Range));
-                // This is our original manual way of creating the deck.
-                /*List<Card> deck = new List<Card>() {
-                    new Card() { Name = "Archer", Power = 1 },
-                    new Card() { Name = "Catapult", Power = 10 },
-                    new Card() { Name = "Bozo the Clown", Power = 3 },
-                    new Card() { Name = "Will", Power = 99 }
-                };*/
+
+                //Sort the deck based on card range (close, range, siege). This is because im neurotic.
+                player.Deck.Sort((x, y) => string.Compare(x.Range, y.Range));
+                
             }
             catch
             {
