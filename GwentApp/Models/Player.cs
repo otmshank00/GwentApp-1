@@ -7,54 +7,56 @@ using System.Collections.ObjectModel;
 using System.Text;
 
 namespace GwentApp.Models
-{
-    public class factionInfo
-    {
-        public string factionName { get; set; }
-        public string factionAbbr { get; set; }
-        public string factionPerk { get; set; }
-    }
-    public class leaderInfo
-    {
-        public string leaderName { get; set; }
-        public string leaderAbility { get; set; }
-        public string leaderFaction { get; set; }
-        public string leaderFactionAbbr { get; set; }
-    }
-    //public class playerChoices
-    //{
-    //    public static List<factionInfo> factionList { get; set; }
-    //    public static List<leaderInfo> leaderList { get; set; }
-    //    public static List<SelectListItem> ddFactionList { get; set; }
-    //    public static List<SelectListItem> ddLeaderList { get; set; }
-    //    public factionInfo selectedFaction { get; set; }
-    //    public leaderInfo selectedLeader { get; set; }
-    //}
-    //
+{   
     public class Player
     {
         /// <summary>
-        /// The player's complete uber model.
+        /// The player's complete uber model. Contains data on available factions and leaders. Stores selected faction and leader and shuffled deck.
         /// </summary>
-
-        public factionInfo faction
+        //A single faction object
+        public FactionInfo Faction
         {
             get; set;
         }
-
-        public leaderInfo leader
+        //A single leader object
+        public LeaderInfo Leader
         {
             get; set;
         }
-        public List<Card> deck
+        //A list of card objects (the deck)
+        public List<Card> Deck
         {
             get; set;
         }
-        public static List<factionInfo> factionList { get; set; }
-        public static List<leaderInfo> leaderList { get; set; }
-        public static List<SelectListItem> ddFactionList { get; set; }
-        public static List<SelectListItem> ddLeaderList { get; set; }
-        public factionInfo selectedFaction { get; set; }
-        public leaderInfo selectedLeader { get; set; }
+        //A list of factions (pulled from db)
+        public static List<FactionInfo> FactionList
+        {
+            get; set;
+        }
+        //A list of leaders (pulled from db)
+        public static List<LeaderInfo> LeaderList
+        {
+            get; set;
+        }
+        //A list used to populate the drop down menu for faction choice
+        public static List<SelectListItem> DdFactionList
+        {
+            get; set;
+        }
+        //A list used to populate the drop down menu for leader choice
+        public static List<SelectListItem> DdLeaderList
+        {
+            get; set;
+        }
+        //The factioninfo object representing the selected faction
+        public FactionInfo SelectedFaction
+        {
+            get; set;
+        }
+        //The leaderinfo object representing the selected leader
+        public LeaderInfo SelectedLeader
+        {
+            get; set;
+        }
     }
 }

@@ -3,6 +3,7 @@
 
 @{
     ViewBag.Title = "Index";
+    //Future use for faction conditional formatting
     string color = "";
 }
 
@@ -11,8 +12,12 @@
 @using (@Html.BeginForm("ProcessIndexForm", "Setup"))
 {
     <table class="table">
-        @foreach (factionInfo faction in Player.factionList)
+        @*Loop the factions and show each one*@
+        @foreach (FactionInfo faction in Player.FactionList)
         {
+            //I really want to format the different factions based on their assigned primary color but that'll have to be later
+            //This block works but I don't know if it's the correct way to do it.
+
             //switch (faction.factionName)
             //{
             //    case "Monsters":
@@ -21,16 +26,16 @@
 
             //}
             <tr>
-                <th style=@color>@Html.Label(faction.factionName)</th>
+                <th style=@color>@Html.Label(faction.FactionName)</th>
                 <td style="font-style:italic;@color">
-                    @Html.Label(faction.factionPerk)
+                    @Html.Label(faction.FactionPerk)
                 </td>
             </tr>
             
         }
     </table>
-    @*@Html.LabelFor(m => m.selectedFaction.factionName, "Pick a faction:");*@
-    @Html.DropDownListFor(m => m.selectedFaction.factionName, Player.ddFactionList,"");
+    //Create the drop down list using the DdFactionList list in the Player model
+    @Html.DropDownListFor(m => m.SelectedFaction.FactionName, Player.DdFactionList,"");
 
     <input type="submit" value="Submit"/>
 }
