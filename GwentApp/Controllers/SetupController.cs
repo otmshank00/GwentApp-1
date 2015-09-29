@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Mvc;
 using GwentApp.Models;
 using Galactic.ActiveDirectory;
@@ -9,6 +10,8 @@ using ADUser = Galactic.ActiveDirectory.User;
 using Galactic.Sql;
 using Galactic.Sql.MSSql;
 using System.Diagnostics;
+using Newtonsoft.Json;
+
 
 namespace GwentApp.Controllers
 {
@@ -17,6 +20,32 @@ namespace GwentApp.Controllers
         // GET: Setup/Index
         public ActionResult Index()
         {
+            //Configuration Data
+            //This is a second sanity check to make sure we can read the configuration.
+            //This will run if the Global.asax checks did not succeed.
+            //This will force a creation of the config file so that the Global check should always work.
+            if (System.IO.File.Exists(Global.gwentAppConfig.FilePath))
+            {
+                //Read the data here
+                string gwentAppOptions = Global.gwentAppConfig.Value;
+                if (gwentAppOptions.Length < 1)
+                {
+                    //Something went wrong opening file. Lets go to definition page
+                    return Redirect("~/AdminPage/");
+                }
+                else
+                {
+                    
+                }
+
+            }
+            else
+            {
+                //File doesn't exist. To the definition page with ye!
+                return Redirect("~/AdminPage/");
+
+            }
+
             //Initialize objects
             Player player = new Player();
             Player.FactionList = new List<FactionInfo>();
@@ -24,9 +53,11 @@ namespace GwentApp.Controllers
             Player.DdFactionList = new List<SelectListItem>();
             Player.DdLeaderList = new List<SelectListItem>();
 
-            //Define SQL query constants
-            const string SELECT_ALL_FACTIONS = "select * from dbo.Factions";
-            const string SELECT_ALL_LEADERS = "select * from dbo.Leaders";
+            //Read SQL query commands from options that (should) be loaded
+            string SELECT_ALL_FACTIONS;
+            string SELECT_ALL_LEADERS;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_FACTIONS", out SELECT_ALL_FACTIONS);
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_LEADERS", out SELECT_ALL_LEADERS);
 
             try
             {
@@ -113,39 +144,106 @@ namespace GwentApp.Controllers
 
             //Define deck constants
             //Final count of cards dealt to player from initialized deck
-            const int STARTING_DECK_SIZE = 10;
+            string S_STARTING_DECK_SIZE;
+            int STARTING_DECK_SIZE;
+            Global.gAppOptions.adminOptions.TryGetValue("STARTING_DECK_SIZE", out S_STARTING_DECK_SIZE);
+            int.TryParse(S_STARTING_DECK_SIZE, out STARTING_DECK_SIZE);
             //Max size of initialized deck
-            const int MAX_DECK_SIZE = 28;
+            string S_MAX_DECK_SIZE;
+            int MAX_DECK_SIZE;
+            Global.gAppOptions.adminOptions.TryGetValue("MAX_DECK_SIZE", out S_MAX_DECK_SIZE);
+            int.TryParse(S_MAX_DECK_SIZE, out MAX_DECK_SIZE);
             //Max number of weather cards to be dealt
-            const int MAX_WEATHER_CARDS = 4;
+            string S_MAX_WEATHER_CARDS;
+            int MAX_WEATHER_CARDS;
+            Global.gAppOptions.adminOptions.TryGetValue("MAX_WEATHER_CARDS", out S_MAX_WEATHER_CARDS);
+            int.TryParse(S_MAX_WEATHER_CARDS, out MAX_WEATHER_CARDS);
             //Max number of neutral unit cards to be dealt
-            const int MAX_N_UNITS = 3;
+            string S_MAX_NEUTRAL_UNITS;
+            int MAX_NEUTRAL_UNITS;
+            Global.gAppOptions.adminOptions.TryGetValue("MAX_NEUTRAL_UNITS", out S_MAX_NEUTRAL_UNITS);
+            int.TryParse(S_MAX_NEUTRAL_UNITS, out MAX_NEUTRAL_UNITS);
             //Max number of neutral hero cards to be dealt
-            const int MAX_N_HEROES = 3;
+            string S_MAX_NEUTRAL_HEROES;
+            int MAX_NEUTRAL_HEROES;
+            Global.gAppOptions.adminOptions.TryGetValue("MAX_NEUTRAL_HEROES", out S_MAX_NEUTRAL_HEROES);
+            int.TryParse(S_MAX_NEUTRAL_HEROES, out MAX_NEUTRAL_HEROES);
             //Max number of neutral special cards to be dealt
-            const int MAX_N_SPECIALS = 3;
+            string S_MAX_NEUTRAL_SPECIALS;
+            int MAX_NEUTRAL_SPECIALS;
+            Global.gAppOptions.adminOptions.TryGetValue("MAX_NEUTRAL_SPECIALS", out S_MAX_NEUTRAL_SPECIALS);
+            int.TryParse(S_MAX_NEUTRAL_SPECIALS, out MAX_NEUTRAL_SPECIALS);
             //Max number of faction hero cards to be dealt
-            const int MAX_F_HEROES = 3;
+            string S_MAX_FACTION_HEROES;
+            int MAX_FACTION_HEROES;
+            Global.gAppOptions.adminOptions.TryGetValue("MAX_FACTION_HEROES", out S_MAX_FACTION_HEROES);
+            int.TryParse(S_MAX_FACTION_HEROES, out MAX_FACTION_HEROES);
             //Max number of faction unit cards to be dealt
-            const int MAX_F_UNITS = 12;
+            string S_MAX_FACTIONS_UNITS;
+            int MAX_FACTION_UNITS;
+            Global.gAppOptions.adminOptions.TryGetValue("MAX_FACTION_UNITS", out S_MAX_FACTIONS_UNITS);
+            int.TryParse(S_MAX_FACTIONS_UNITS, out MAX_FACTION_UNITS);
 
             //Define SQL query constants. These work off of existing views in the database.
             //Get all weather cards
-            const string SELECT_ALL_WEATHER_CARDS = "select * from AllWeather";
+            string SELECT_ALL_WEATHER_CARDS;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_WEATHER_CARDS", out SELECT_ALL_WEATHER_CARDS);
             //Get all neutral unit cards
-            const string SELECT_ALL_N_UNITS = "select * from AllNeutralUnits";
+            string SELECT_ALL_NEUTRAL_UNITS;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_NEUTRAL_UNITS", out SELECT_ALL_NEUTRAL_UNITS);
             //Get all neutral hero cards
-            const string SELECT_ALL_N_HEROS = "select * from AllNeutralHeros";
+            string SELECT_ALL_NEUTRAL_HEROES;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_NEUTRAL_HEROES", out SELECT_ALL_NEUTRAL_HEROES);
             //Get all neutral special cards
-            const string SELECT_ALL_N_SPECIALS = "select * from AllNeutralSpecial";
+            string SELECT_ALL_NEUTRAL_SPECIALS;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_NEUTRAL_SPECIALS", out SELECT_ALL_NEUTRAL_SPECIALS);
 
+            //Get the SQL to select all faction specific heroes
+            string SELECT_ALL_NR_HEROES;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_NR_HEROES", out SELECT_ALL_NR_HEROES);
+            string SELECT_ALL_NE_HEROES;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_NE_HEROES", out SELECT_ALL_NE_HEROES);
+            string SELECT_ALL_MS_HEROES;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_MS_HEROES", out SELECT_ALL_MS_HEROES);
+            string SELECT_ALL_ST_HEROES;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_ST_HEROES", out SELECT_ALL_ST_HEROES);
 
-            //Get all selected faction hero cards. Can't be a const because of the abbreviation trick
-            string selectAllFHeros = "select * from All" + factionAbbreviation + "Heros";
-            //Get all selected faction unit cards. Can't be a const because of the abbreviation trick
-            string selectAllFUnits = "select * from All" + factionAbbreviation + "Units";
+            //Get the SQL to select all faction specific units
+            string SELECT_ALL_NR_UNITS;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_NR_UNITS", out SELECT_ALL_NR_UNITS);
+            string SELECT_ALL_NE_UNITS;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_NE_UNITS", out SELECT_ALL_NE_UNITS);
+            string SELECT_ALL_MS_UNITS;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_MS_UNITS", out SELECT_ALL_MS_UNITS);
+            string SELECT_ALL_ST_UNITS;
+            Global.gAppOptions.adminOptions.TryGetValue("SELECT_ALL_ST_UNITS", out SELECT_ALL_ST_UNITS);
 
-
+            //Sort out what faction and heroes we're pulling units from
+            string selectAllFUnits = "";
+            string selectAllFHeroes = "";
+            switch (factionAbbreviation)
+            {
+                case "NR":
+                    selectAllFUnits = SELECT_ALL_NR_UNITS;
+                    selectAllFHeroes = SELECT_ALL_NR_HEROES;
+                    break;
+                case "NE":
+                    selectAllFUnits = SELECT_ALL_NE_UNITS;
+                    selectAllFHeroes = SELECT_ALL_NE_HEROES;
+                    break;
+                case "MS":
+                    selectAllFUnits = SELECT_ALL_MS_UNITS;
+                    selectAllFHeroes = SELECT_ALL_MS_HEROES;
+                    break;
+                case "ST":
+                    selectAllFUnits = SELECT_ALL_ST_UNITS;
+                    selectAllFHeroes = SELECT_ALL_ST_HEROES;
+                    break;
+                default: //Good gracious, please never be here. For Temeria!
+                    selectAllFUnits = SELECT_ALL_NR_UNITS;
+                    selectAllFHeroes = SELECT_ALL_NR_HEROES;
+                    break;
+            }
 
             // Wrap SQL calls in a try / catch so that any exceptions are caught and handled.
             try
@@ -158,10 +256,10 @@ namespace GwentApp.Controllers
                 
                 // Execute queries to get the card values from the database.
                 List<SqlRow> weatherRows = sqlUtil.ExecuteQuery(SELECT_ALL_WEATHER_CARDS, Global.connectionString, null);
-                List<SqlRow> neutralUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_N_UNITS, Global.connectionString, null);
-                List<SqlRow> neutralHeroUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_N_HEROS, Global.connectionString, null);
-                List<SqlRow> neutralSpecialUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_N_SPECIALS, Global.connectionString, null);
-                List<SqlRow> allFactionHeroesRows = sqlUtil.ExecuteQuery(selectAllFHeros, Global.connectionString, null);
+                List<SqlRow> neutralUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_NEUTRAL_UNITS, Global.connectionString, null);
+                List<SqlRow> neutralHeroUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_NEUTRAL_HEROES, Global.connectionString, null);
+                List<SqlRow> neutralSpecialUnitsRows = sqlUtil.ExecuteQuery(SELECT_ALL_NEUTRAL_SPECIALS, Global.connectionString, null);
+                List<SqlRow> allFactionHeroesRows = sqlUtil.ExecuteQuery(selectAllFHeroes, Global.connectionString, null);
                 List<SqlRow> allFactionUnitsRows = sqlUtil.ExecuteQuery(selectAllFUnits, Global.connectionString, null);
                 
                 //Shuffle the deck and remove a random card until our row count meets the defined max constant
@@ -176,7 +274,7 @@ namespace GwentApp.Controllers
                 }
                 if (neutralUnitsRows != null)
                 {
-                    while (neutralUnitsRows.Count > MAX_N_UNITS)
+                    while (neutralUnitsRows.Count > MAX_NEUTRAL_UNITS)
                     {
                         Random rnd = new Random();
                         int rand = rnd.Next(0, neutralUnitsRows.Count);
@@ -185,7 +283,7 @@ namespace GwentApp.Controllers
                 }
                 if (neutralHeroUnitsRows != null)
                 {
-                    while (neutralHeroUnitsRows.Count > MAX_N_HEROES)
+                    while (neutralHeroUnitsRows.Count > MAX_NEUTRAL_HEROES)
                     {
                         Random rnd = new Random();
                         int rand = rnd.Next(0, neutralHeroUnitsRows.Count);
@@ -194,7 +292,7 @@ namespace GwentApp.Controllers
                 }
                 if (neutralSpecialUnitsRows != null)
                 {
-                    while (neutralSpecialUnitsRows.Count > MAX_N_SPECIALS)
+                    while (neutralSpecialUnitsRows.Count > MAX_NEUTRAL_SPECIALS)
                     {
                         Random rnd = new Random();
                         int rand = rnd.Next(0, neutralSpecialUnitsRows.Count);
@@ -203,7 +301,7 @@ namespace GwentApp.Controllers
                 }
                 if (allFactionHeroesRows != null)
                 {
-                    while (allFactionHeroesRows.Count > MAX_F_HEROES)
+                    while (allFactionHeroesRows.Count > MAX_FACTION_HEROES)
                     {
                         Random rnd = new Random();
                         int rand = rnd.Next(0, allFactionHeroesRows.Count);
@@ -212,7 +310,7 @@ namespace GwentApp.Controllers
                 }
                 if (allFactionUnitsRows != null)
                 {
-                    while (allFactionUnitsRows.Count > MAX_F_UNITS)
+                    while (allFactionUnitsRows.Count > MAX_FACTION_UNITS)
                     {
                         Random rnd = new Random();
                         int rand = rnd.Next(0, allFactionUnitsRows.Count);
@@ -293,7 +391,7 @@ namespace GwentApp.Controllers
             ActiveDirectory ad = GwentApp.Global.ad;
 
             ADUser user = new ADUser(ad, ad.GetGUIDBySAMAccountName(User.Identity.Name));
-
+            
             return View(user);
         }
     }
