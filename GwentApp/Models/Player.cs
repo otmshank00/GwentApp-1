@@ -23,8 +23,13 @@ namespace GwentApp.Models
         {
             get; set;
         }
-        //A list of card objects (the deck)
+        //A list of card objects to pull starting deck from 
         public List<Card> Deck
+        {
+            get; set;
+        }
+        //A list of card objects that the player starts the game with
+        public List<Card> StartDeck
         {
             get; set;
         }
