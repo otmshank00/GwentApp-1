@@ -374,9 +374,21 @@ namespace GwentApp.Controllers
                     }
                 }
 
+                //Build the start deck
+                //This is the initial draw the player starts with
+                player.StartDeck = new List<Card>();
+                for (int index = 0; index < STARTING_DECK_SIZE; index++)
+                {
+                    Random rnd = new Random();
+                    int rand = rnd.Next(0, player.Deck.Count);
+                    player.StartDeck.Add(player.Deck[rand]);
+                    player.Deck.RemoveAt(rand);
+                }
+
                 //Sort the deck based on card range (close, range, siege). This is because im neurotic.
                 player.Deck.Sort((x, y) => string.Compare(x.Range, y.Range));
-                
+                player.StartDeck.Sort((x, y) => string.Compare(x.Range, y.Range));
+
             }
             catch
             {
