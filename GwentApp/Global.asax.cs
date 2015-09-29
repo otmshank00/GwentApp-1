@@ -12,6 +12,7 @@ using Galactic.ActiveDirectory;
 using Galactic.Configuration;
 using Galactic.Sql.MSSql;
 using GwentApp.Models;
+using Newtonsoft.Json;
 
 namespace GwentApp
 {
@@ -26,10 +27,16 @@ namespace GwentApp
         // The name of the configuration item that conatins the information required to connect to the Gwent database.
         private const string DB_CONFIGURATION_ITEM_NAME = "Db";
 
+        // The name of the configuration item that contains the application settings, SQL queries and game constants
+        private const string GWENTAPP_CONFIGURATION_ITEM_NAME = "GwentApp";
+
         // Global objects application objects.
         public static ActiveDirectory ad;
         public static string connectionString;
-                
+        public static ConfigurationItem gwentAppConfig;
+        public static AppOptions gAppOptions;
+
+
         void Application_Start(object sender, EventArgs e)
         {
             // Code that runs on application startup
@@ -43,6 +50,26 @@ namespace GwentApp
             // Get our SQL connection string.
             ConfigurationItem sqlConfig = new ConfigurationItem(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), DB_CONFIGURATION_ITEM_NAME, true);
             connectionString = sqlConfig.Value;
+
+            // Setup the application config
+            gwentAppConfig = new ConfigurationItem(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), GWENTAPP_CONFIGURATION_ITEM_NAME, false);
+
+            //Initial configuration check/read in
+            //If the file exists, then read it in. If not, then the controller checks will have to do.
+            if (System.IO.File.Exists(gwentAppConfig.FilePath))
+            {
+                //Read the data here
+                string gwentAppOptions = gwentAppConfig.Value;
+                try
+                {
+                    gAppOptions = JsonConvert.DeserializeObject<AppOptions>(gwentAppOptions);
+                }
+                catch
+                {
+
+                }
+            }
+
         }
     }
 }
