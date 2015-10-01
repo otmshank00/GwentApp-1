@@ -12,6 +12,9 @@
 <table class="table">
     <tr>
         <th>
+            @Html.DisplayName("Image")
+        </th>
+        <th>
             @Html.DisplayName("Name")
         </th>
         <th>
@@ -36,6 +39,9 @@
     {
         //Nifty bit of conditional formatting here. If the card is a hero then the table row is gold.
         <tr style="@(c.Hero ? " background-color:#C27E3A" : "")">
+            <td>
+                <img height="155" width="82" src="@Url.Content(c.picturePath)" />
+            </td>
             <td>
                 @Html.DisplayFor(x => c.Name)
             </td>

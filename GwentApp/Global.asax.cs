@@ -21,6 +21,9 @@ namespace GwentApp
         // The directory containing configuration items used by the application.
         private const string CONFIG_ITEM_DIRECTORY = @"~\ConfigurationItems\";
 
+        //The directory containing picture assets
+        private const string PICTURE_DIRECTORY = @"~\Pictures\";
+
         // The name of the configuration item that conatins the information required to connect to Active Directory.
         private const string ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME = "ActiveDirectory";
 
@@ -35,7 +38,7 @@ namespace GwentApp
         public static string connectionString;
         public static ConfigurationItem gwentAppConfig;
         public static AppOptions gAppOptions;
-
+        public static string pictureMapPath;
 
         void Application_Start(object sender, EventArgs e)
         {
@@ -53,6 +56,9 @@ namespace GwentApp
 
             // Setup the application config
             gwentAppConfig = new ConfigurationItem(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), GWENTAPP_CONFIGURATION_ITEM_NAME, false);
+
+            //Map path to pictures
+            pictureMapPath = HostingEnvironment.MapPath(PICTURE_DIRECTORY);
 
             //Initial configuration check/read in
             //If the file exists, then read it in. If not, then the controller checks will have to do.
