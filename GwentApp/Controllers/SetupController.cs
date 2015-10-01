@@ -369,7 +369,8 @@ namespace GwentApp.Controllers
                             card.Ability = (string)row["cardAbilities"];
                         }
                         catch { }
-
+                        //card.picturePath = Global.pictureMapPath+(card.Name.ToString().Trim().Replace(" ", "%20"))+".png";
+                        card.picturePath = "~/Content/Images/" + (card.Name.ToString().Trim().Replace(" ", "%20")) + ".png";
                         player.Deck.Add(card);
                     }
                 }
