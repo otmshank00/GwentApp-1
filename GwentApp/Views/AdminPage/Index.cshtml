@@ -1,0 +1,22 @@
+﻿@using GwentApp.Models
+@model GwentApp.Models.AppOptions
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Admin Page</h2>
+@using (@Html.BeginForm("UpdateAppOptions", "AdminPage"))
+{
+    foreach (KeyValuePair<string, string> i in Model.adminOptions)
+    {
+
+        @Html.Label(i.Key) <br />
+        @Html.EditorFor(v => v.adminOptions[i.Key]) <br />
+        
+    }
+    <input type="submit" value="Save" />
+}
+@using (Html.BeginForm("ResetAppOptions", "AdminPage"))
+{
+    <input type="submit" value="Reset to defaults" />
+}
