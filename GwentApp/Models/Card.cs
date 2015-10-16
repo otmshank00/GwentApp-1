@@ -57,7 +57,7 @@ namespace GwentApp.Models
         }
 
         //The picture path for the card
-        public string picturePath
+        public string ImageFilePath
         {
             get; set;
         }
