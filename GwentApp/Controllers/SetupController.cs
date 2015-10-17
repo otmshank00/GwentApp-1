@@ -20,6 +20,12 @@ namespace GwentApp.Controllers
         // GET: Setup/Index
         public ActionResult Index()
         {
+            //string varname = Request.QueryString["myVar"];
+
+            //session variables
+            //passed in cookies
+            //string varsession = Session["mySessionVar"];
+
             //Configuration Data
             //This is a second sanity check to make sure we can read the configuration.
             //This will run if the Global.asax checks did not succeed.
@@ -369,8 +375,19 @@ namespace GwentApp.Controllers
                             card.Ability = (string)row["cardAbilities"];
                         }
                         catch { }
-                        //card.picturePath = Global.pictureMapPath+(card.Name.ToString().Trim().Replace(" ", "%20"))+".png";
-                        card.picturePath = "~/Content/Images/" + (card.Name.ToString().Trim().Replace(" ", "%20")) + ".png";
+                        try
+                        {
+                            card.Quote = (string)row["cardQuote"];
+                        }
+                        catch { }
+                        //New logic to read image file from DB and build path. ImageFilePath
+                        try
+                        {
+                            string cardImageFileName = (string)row["cardImageFileName"];
+                            card.ImageFilePath = "~/Content/Images/" + (cardImageFileName.Trim().Replace(" ", "%20"));
+
+                        }
+                        catch { }
                         player.Deck.Add(card);
                     }
                 }
@@ -391,9 +408,10 @@ namespace GwentApp.Controllers
                 player.StartDeck.Sort((x, y) => string.Compare(x.Range, y.Range));
 
             }
-            catch
+            catch (Exception err)
             {
                 // We're not going to do anything on an exception, we'll just return the empty deck initialized above.
+                Debug.WriteLine(err.Message);
             }
 
             return View(player);
