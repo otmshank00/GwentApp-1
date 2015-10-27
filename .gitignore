@@ -6,6 +6,7 @@
 *.user
 *.sln.docstates
 ActiveDirectory.config
+.vs/config/applicationhost.config
 
 # Build results
 [Dd]ebug/
@@ -174,7 +175,7 @@ UpgradeLog*.htm
 
 # SQL Server files
 # *.mdf
-# *.ldf
+*.ldf
 
 # Business Intelligence projects
 *.rdl.data

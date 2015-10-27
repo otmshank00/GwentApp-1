@@ -162,6 +162,7 @@
     <Content Include="App_Data\GwentCards_log.ldf">
       <DependentUpon>GwentCards.mdf</DependentUpon>
     </Content>
+    <Content Include="App_Data\populategwentdb.sql" />
     <Content Include="ConfigurationItems\ActiveDirectory.config" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
@@ -339,6 +340,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="ConfigurationItems\SimpleMappingRoleProvider.config" />
     <Content Include="ConfigurationItems\Db.config" />
+    <Content Include="ConfigurationItems\GwentApp.config" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
