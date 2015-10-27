@@ -11,8 +11,18 @@ using System.Web.Http;
 using Galactic.ActiveDirectory;
 using Galactic.Configuration;
 using Galactic.Sql.MSSql;
+using Galactic.Sql;
 using GwentApp.Models;
 using Newtonsoft.Json;
+using GwentApp.Controllers;
+
+//redo the app options to be proper properties
+//read the app options here
+//read the entire data base here into a list
+//create the global individual lists for each faction, weather, special
+//reference these globals in the create deck method
+
+ //sdfdsfsdfsdsdfsdf
 
 namespace GwentApp
 {
@@ -37,8 +47,16 @@ namespace GwentApp
         public static ActiveDirectory ad;
         public static string connectionString;
         public static ConfigurationItem gwentAppConfig;
+        //The application options (AppOptions.cs) class
         public static AppOptions gAppOptions;
         public static string pictureMapPath;
+        //List of all cards in the database
+        public static List<Card> gAllCards = new List<Card>();
+        //List of all factions in the database
+        public static List<FactionInfo> gAllFactions = new List<FactionInfo>();
+        //List of all leaders in the database
+        public static List<LeaderInfo> gAllLeaders = new List<LeaderInfo>();
+        //Maybe don't create lists for each faction. Dynamically build the player deck using in mem queries from the gAllCards. Don't work twice
 
         void Application_Start(object sender, EventArgs e)
         {
@@ -56,26 +74,165 @@ namespace GwentApp
 
             // Setup the application config
             gwentAppConfig = new ConfigurationItem(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), GWENTAPP_CONFIGURATION_ITEM_NAME, false);
+            if (System.IO.File.Exists(gwentAppConfig.FilePath))
+            {
+                if (gwentAppConfig.Value.Length > 1)
+                {
+                    
+                    try
+                    {
+                        //Read the options
+                        gAppOptions = (AdminPageController.ReadAppOptions(gwentAppConfig.Value));
+                        //Check for valid data
+                        if (gAppOptions.MaxDeckSize < 1)
+                        {
+                            //If unable to, recreate as defaults
+                            bool writesuccess = AdminPageController.WriteOptions(gwentAppConfig.FilePath, new AppOptions(), true);
+                            gAppOptions = (AdminPageController.ReadAppOptions(gwentAppConfig.Value));
+                        }
+                    }
+                    catch
+                    {
+                        
+                    }
+                }
+                else
+                {
+                    //If unable to, recreate as defaults
+                    bool writesuccess = AdminPageController.WriteOptions(gwentAppConfig.FilePath, new AppOptions(), true);
+                    gAppOptions = (AdminPageController.ReadAppOptions(gwentAppConfig.Value));
+                }
+            }
+            else
+            {
+                //If unable to, recreate as defaults
+                bool writesuccess = AdminPageController.WriteOptions(gwentAppConfig.FilePath, new AppOptions(), true);
+                gAppOptions = (AdminPageController.ReadAppOptions(gwentAppConfig.Value));
+            }
+
 
             //Map path to pictures
             pictureMapPath = HostingEnvironment.MapPath(PICTURE_DIRECTORY);
 
-            //Initial configuration check/read in
-            //If the file exists, then read it in. If not, then the controller checks will have to do.
-            if (System.IO.File.Exists(gwentAppConfig.FilePath))
+            //Fill the lists of cards, leaders and factions here
+            DatabaseRead();
+
+        }
+
+        void DatabaseRead()
+        {
+            // Create a utility to handle the SQL calls for this action.
+            MSSqlUtility sqlUtil = new MSSqlUtility();
+
+            //Create an empty row list to be used as the all cards holder
+            List<SqlRow> allCardsRows = new List<SqlRow>();
+
+            //Create an empty row list to be used as the all factions holder
+            List<SqlRow> allFactionsRows = new List<SqlRow>();
+
+            //Create an empty row list to be used as the all leaders holder
+            List<SqlRow> allLeadersRows = new List<SqlRow>();
+            try
             {
-                //Read the data here
-                string gwentAppOptions = gwentAppConfig.Value;
-                try
-                {
-                    gAppOptions = JsonConvert.DeserializeObject<AppOptions>(gwentAppOptions);
-                }
-                catch
-                {
 
+                allCardsRows = sqlUtil.ExecuteQuery(gAppOptions.SelectAllPlayerCards, connectionString, null);
+
+                //READ LEADERS AND FACTIONS
+                allFactionsRows = sqlUtil.ExecuteQuery(gAppOptions.SelectAllFactions, connectionString, null);
+                allLeadersRows = sqlUtil.ExecuteQuery(gAppOptions.SelectAllLeaders, connectionString, null);
+                //Build the Factions and build the list
+                if (allFactionsRows != null)
+                {
+                    foreach (SqlRow row in allFactionsRows)
+                    {
+                        //Assign the returned database values into the object
+                        FactionInfo faction = new FactionInfo();
+                        faction.FactionName = ((string)row["factionName"]).Trim();
+                        faction.FactionAbbr = ((string)row["factionAbbreviation"]).Trim();
+                        faction.FactionPerk = ((string)row["factionPerk"]).Trim();
+                        gAllFactions.Add(faction);
+                    }
                 }
+                //Build the Leaders and build the list
+                if (allLeadersRows != null)
+                {
+                    foreach (SqlRow row in allLeadersRows)
+                    {
+                        //Assign the returned database values into the object
+                        LeaderInfo leader = new LeaderInfo();
+                        leader.LeaderName = ((string)row["leaderName"]).Trim();
+                        leader.LeaderAbility = ((string)row["leaderAbility"]).Trim();
+                        leader.LeaderFaction = ((string)row["leaderFaction"]).Trim();
+                        leader.LeaderFactionAbbr = ((string)row["leaderFactionAbbreviation"]);
+                        gAllLeaders.Add(leader);
+                    }
+                }
+                //Build the motherlode deck by assigning the attributes from the database into the object attributes.
+                //The TRY/CATCH is there to handle potential null values because C# null is not the same as DBNULL 
+                if (allCardsRows != null)
+                {
+                    foreach (SqlRow row in allCardsRows)
+                    {
+                        Card card = new Card();
+                        try
+                        {
+                            card.Name = (string)row["cardName"];
+                        }
+                        catch
+                        { }
+                        try
+                        {
+                            card.Power = (int)row["cardPower"];
+                        }
+                        catch { }
+                        try
+                        {
+                            card.Faction = (string)row["cardFaction"];
+                        }
+                        catch { }
+                        try
+                        {
+                            card.Quote = (string)row["cardQuote"];
+                        }
+                        catch { }
+                        try
+                        {
+                            card.Hero = (bool)(row["cardHero"]);
+                        }
+                        catch { }
+                        try
+                        {
+                            card.Range = (string)row["cardRange"];
+                        }
+                        catch { }
+                        try
+                        {
+                            card.Ability = (string)row["cardAbilities"];
+                        }
+                        catch { }
+                        try
+                        {
+                            card.Quote = (string)row["cardQuote"];
+                        }
+                        catch { }
+                        //New logic to read image file from DB and build path. ImageFilePath
+                        try
+                        {
+                            string cardImageFileName = (string)row["cardImageFileName"];
+                            card.ImageFilePath = "~/Content/Images/" + (cardImageFileName.Trim().Replace(" ", "%20"));
+
+                        }
+                        catch { }
+                        gAllCards.Add(card);
+                    }
+                }
+
+
+            } // end of Try-No Touchy
+            catch
+            {
+                //Do we need to perform an action on catch?
             }
-
         }
     }
 }

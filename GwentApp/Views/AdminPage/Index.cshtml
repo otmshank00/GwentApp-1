@@ -7,13 +7,71 @@
 <h2>Admin Page</h2>
 @using (@Html.BeginForm("UpdateAppOptions", "AdminPage"))
 {
-    foreach (KeyValuePair<string, string> i in Model.adminOptions)
+    @*foreach (KeyValuePair<string, string> i in Model.adminOptions)
     {
 
         @Html.Label(i.Key) <br />
         @Html.EditorFor(v => v.adminOptions[i.Key]) <br />
         
-    }
+    }*@
+    @Html.LabelFor(o => o.MaxDeckSize) <br />
+    @Html.EditorFor(o => o.MaxDeckSize) <br />
+    @Html.LabelFor(o => o.StartingDeckSize) <br />
+    @Html.EditorFor(o => o.StartingDeckSize) <br />
+    @Html.LabelFor(o => o.MaxFactionHeroes) <br />
+    @Html.EditorFor(o => o.MaxFactionHeroes) <br />
+    @Html.LabelFor(o => o.MaxFactionUnits) <br />
+    @Html.EditorFor(o => o.MaxFactionUnits) <br />
+    @Html.LabelFor(o => o.MaxNeutralHeroes) <br />
+    @Html.EditorFor(o => o.MaxNeutralHeroes) <br />
+    @Html.LabelFor(o => o.MaxNeutralSpecials) <br />
+    @Html.EditorFor(o => o.MaxNeutralSpecials) <br />
+    @Html.LabelFor(o => o.MaxNeutralUnits) <br />
+    @Html.EditorFor(o => o.MaxNeutralUnits) <br />
+    @Html.LabelFor(o => o.MaxWeatherCards) <br />
+    @Html.EditorFor(o => o.MaxWeatherCards) <br />
+    @Html.LabelFor(o => o.SelectAllFactions) <br />
+    @Html.EditorFor(o => o.SelectAllFactions) <br />
+    @Html.LabelFor(o => o.SelectAllLeaders) <br />
+    @Html.EditorFor(o => o.SelectAllLeaders) <br />
+    @Html.LabelFor(o => o.SelectAllMSHeroes) <br />
+    @Html.EditorFor(o => o.SelectAllMSHeroes) <br />
+    @Html.LabelFor(o => o.SelectAllMSUnits) <br />
+    @Html.EditorFor(o => o.SelectAllMSUnits) <br />
+    @Html.LabelFor(o => o.SelectAllNEHeroes) <br />
+    @Html.EditorFor(o => o.SelectAllNEHeroes) <br />
+    @Html.LabelFor(o => o.SelectAllNEUnits) <br />
+    @Html.EditorFor(o => o.SelectAllNEUnits) <br />
+    @Html.LabelFor(o => o.SelectAllNeutralHeroes) <br/>
+    @Html.EditorFor(o => o.SelectAllNeutralHeroes) <br />
+    @Html.LabelFor(o => o.SelectAllNeutralSpecials) <br />
+    @Html.EditorFor(o => o.SelectAllNeutralSpecials) <br />
+    @Html.LabelFor(o => o.SelectAllNeutralUnits) <br />
+    @Html.EditorFor(o => o.SelectAllNeutralUnits) <br />
+    @Html.LabelFor(o => o.SelectAllNRHeroes) <br />
+    @Html.EditorFor(o => o.SelectAllNRHeroes) <br />
+    @Html.LabelFor(o => o.SelectAllNRUnits) <br />
+    @Html.EditorFor(o => o.SelectAllNRUnits) <br />
+    @Html.LabelFor(o => o.SelectAllPlayerCards) <br />
+    @Html.EditorFor(o => o.SelectAllPlayerCards) <br />
+    @Html.LabelFor(o => o.SelectAllSTHeroes) <br />
+    @Html.EditorFor(o => o.SelectAllSTHeroes) <br />
+    @Html.LabelFor(o => o.SelectAllSTUnits) <br />
+    @Html.EditorFor(o => o.SelectAllSTUnits) <br />
+    @Html.LabelFor(o => o.SelectAllWeatherCards) <br />
+    @Html.EditorFor(o => o.SelectAllWeatherCards) <br />
+    @Html.LabelFor(o => o.StartingDeckSize) <br />
+    @Html.EditorFor(o => o.StartingDeckSize) <br />
+    @Html.LabelFor(o => o.WeatherIdentifier) <br />
+    @Html.EditorFor(o => o.WeatherIdentifier) <br />
+    @Html.LabelFor(o => o.NeutralIdentifier) <br />
+    @Html.EditorFor(o => o.NeutralIdentifier) <br />
+    @Html.LabelFor(o => o.CloseIdentifier) <br />
+    @Html.EditorFor(o => o.CloseIdentifier) <br />
+    @Html.LabelFor(o => o.RangedIdentifier) <br />
+    @Html.EditorFor(o => o.RangedIdentifier) <br />
+    @Html.LabelFor(o => o.SiegeIdentifier) <br />
+    @Html.EditorFor(o => o.SiegeIdentifier) <br />
     <input type="submit" value="Save" />
 }
 @using (Html.BeginForm("ResetAppOptions", "AdminPage"))

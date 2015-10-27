@@ -20,7 +20,7 @@ namespace GwentApp.Controllers
 
             //Use Global?
             Global.gAppOptions = new AppOptions();
-            Global.gAppOptions.adminOptions = new Dictionary<string, string>();
+            //Global.gAppOptions.adminOptions = new Dictionary<string, string>();
 
             //Check for existance of config file
             //Yet another sanity check. Redundant code is redundant but this will be sure that we don't end up with no config.
@@ -64,7 +64,7 @@ namespace GwentApp.Controllers
         /// <param name="options"></param>
         /// <param name="isDefaults"></param>
         /// <returns></returns>
-        public bool WriteOptions(string filePath, AppOptions options, bool isDefaults)
+        public static bool WriteOptions(string filePath, AppOptions options, bool isDefaults)
         {
             //DB Maxes for sanity check: weather 12, n-units 14, n-heroes 4, f-units 32, f-heroes 4
             
@@ -72,54 +72,61 @@ namespace GwentApp.Controllers
             bool writeSuccess = false;
             //Define write object
             AppOptions optionsToWrite = new AppOptions();
-            optionsToWrite.adminOptions = new Dictionary<string, string>();
             if (isDefaults)
             {
                 //Define object then fill it
                 AppOptions defaultOptions = new AppOptions();
-                //Dictionary<string, string> defaultOptions = new Dictionary<string, string>();
-                defaultOptions.adminOptions = new Dictionary<string, string>();
                 //Final count of cards dealt to player from initialized deck
-                defaultOptions.adminOptions.Add("STARTING_DECK_SIZE", "10");
+                defaultOptions.StartingDeckSize = 10;
                 //Max size of initialized deck
-                defaultOptions.adminOptions.Add("MAX_DECK_SIZE", "28");
+                defaultOptions.MaxDeckSize = 28;
                 //Max number of weather cards to be dealt
-                defaultOptions.adminOptions.Add("MAX_WEATHER_CARDS", "4");
+                defaultOptions.MaxWeatherCards = 4;
                 //Max number of neutral unit cards to be dealt
-                defaultOptions.adminOptions.Add("MAX_NEUTRAL_UNITS", "3");
+                defaultOptions.MaxNeutralUnits = 3;
                 //Max number of neutral hero cards to be dealt
-                defaultOptions.adminOptions.Add("MAX_NEUTRAL_HEROES", "3");
+                defaultOptions.MaxNeutralHeroes = 3;
                 //Max number of neutral special cards to be dealt
-                defaultOptions.adminOptions.Add("MAX_NEUTRAL_SPECIALS", "3");
+                defaultOptions.MaxNeutralSpecials = 3;
                 //Max number of faction hero cards to be dealt
-                defaultOptions.adminOptions.Add("MAX_FACTION_HEROES", "3");
+                defaultOptions.MaxFactionHeroes = 3;
                 //Max number of faction unit cards to be dealt
-                defaultOptions.adminOptions.Add("MAX_FACTION_UNITS", "12");
+                defaultOptions.MaxFactionUnits = 12;
+                //Min number of faction units to be included in deck.
+                defaultOptions.MinFactionUnits = 4;
 
                 //Define SQL query constants. These work off of existing views in the database.
                 //Get all weather cards
-                defaultOptions.adminOptions.Add("SELECT_ALL_WEATHER_CARDS", "select * from AllWeather");
+                defaultOptions.SelectAllWeatherCards = "select * from AllWeather";
                 //Get all neutral unit cards
-                defaultOptions.adminOptions.Add("SELECT_ALL_NEUTRAL_UNITS", "select * from AllNeutralUnits");
+                defaultOptions.SelectAllNeutralUnits = "select * from AllNeutralUnits";
                 //Get all neutral hero cards
-                defaultOptions.adminOptions.Add("SELECT_ALL_NEUTRAL_HEROES", "select * from AllNeutralHeros");
+                defaultOptions.SelectAllNeutralHeroes = "select * from AllNeutralHeros";
                 //Get all neutral special cards
-                defaultOptions.adminOptions.Add("SELECT_ALL_NEUTRAL_SPECIALS", "select * from AllNeutralSpecial");
+                defaultOptions.SelectAllNeutralSpecials = "select * from AllNeutralSpecials";
 
                 //Get all selected faction hero cards.
-                defaultOptions.adminOptions.Add("SELECT_ALL_NR_HEROES", "select * from AllNRHeroes");
-                defaultOptions.adminOptions.Add("SELECT_ALL_NE_HEROES", "select * from AllNEHeroes");
-                defaultOptions.adminOptions.Add("SELECT_ALL_ST_HEROES", "select * from AllSTHeroes");
-                defaultOptions.adminOptions.Add("SELECT_ALL_MS_HEROES", "select * from AllMSHeroes");
+                defaultOptions.SelectAllNRHeroes = "select * from AllNRHeroes";
+                defaultOptions.SelectAllNEHeroes = "select * from AllNEHeroes";
+                defaultOptions.SelectAllSTHeroes = "select * from AllSTHeroes";
+                defaultOptions.SelectAllMSHeroes = "select * from AllMSHeroes";
                 //Get all selected faction unit cards.
-                defaultOptions.adminOptions.Add("SELECT_ALL_NR_UNITS", "select * from AllNRUnits");
-                defaultOptions.adminOptions.Add("SELECT_ALL_NE_UNITS", "select * from AllNEUnits");
-                defaultOptions.adminOptions.Add("SELECT_ALL_ST_UNITS", "select * from AllSTUnits");
-                defaultOptions.adminOptions.Add("SELECT_ALL_MS_UNITS", "select * from AllMSUnits");
-
+                defaultOptions.SelectAllNRUnits = "select * from AllNRUnits";
+                defaultOptions.SelectAllNEUnits = "select * from AllNEUnits";
+                defaultOptions.SelectAllSTUnits = "select * from AllSTUnits";
+                defaultOptions.SelectAllMSUnits = "select * from AllMSUnits";
                 //Define SQL query constants
-                defaultOptions.adminOptions.Add("SELECT_ALL_FACTIONS", "select * from dbo.Factions");
-                defaultOptions.adminOptions.Add("SELECT_ALL_LEADERS", "select * from dbo.Leaders");
+                defaultOptions.SelectAllFactions = "select * from dbo.factions";
+                defaultOptions.SelectAllLeaders = "select * from dbo.leaders";
+                defaultOptions.SelectAllPlayerCards = "select * from dbo.cards";
+
+                //Define modal search values
+                defaultOptions.CloseIdentifier = "Close";
+                defaultOptions.SiegeIdentifier = "Siege";
+                defaultOptions.RangedIdentifier = "Ranged";
+                defaultOptions.WeatherIdentifier = "Weather";
+                defaultOptions.NeutralIdentifier = "Neutral";
+                
 
                 //Set optionsToWrite
                 optionsToWrite = defaultOptions;
@@ -129,25 +136,25 @@ namespace GwentApp.Controllers
                 //Set optionsToWrite
                 optionsToWrite = options;
                 //DB Maxes for sanity check: weather 12, n-units 14, n-heroes 4, f-units 32, f-heroes 4
-                if (int.Parse(optionsToWrite.adminOptions["MAX_WEATHER_CARDS"]) > 12)
+                if (optionsToWrite.MaxWeatherCards > 12)
                 {
-                    optionsToWrite.adminOptions["MAX_WEATHER_CARDS"] = "12";
+                    optionsToWrite.MaxWeatherCards = 12;
                 }
-                if (int.Parse(optionsToWrite.adminOptions["MAX_NEUTRAL_UNITS"]) > 14)
+                if (optionsToWrite.MaxNeutralUnits > 14)
                 {
-                    optionsToWrite.adminOptions["MAX_NEUTRAL_UNITS"] = "14";
+                    optionsToWrite.MaxNeutralUnits = 14;
                 }
-                if (int.Parse(optionsToWrite.adminOptions["MAX_NEUTRAL_HEROES"]) > 4)
+                if (optionsToWrite.MaxNeutralHeroes > 4)
                 {
-                    optionsToWrite.adminOptions["MAX_NEUTRAL_HEROES"] = "4";
+                    optionsToWrite.MaxNeutralHeroes = 4;
                 }
-                if (int.Parse(optionsToWrite.adminOptions["MAX_FACTION_UNITS"]) > 32)
+                if (optionsToWrite.MaxFactionUnits > 32)
                 {
-                    optionsToWrite.adminOptions["MAX_FACTION_UNITS"] = "32";
+                    optionsToWrite.MaxFactionUnits = 32;
                 }
-                if (int.Parse(optionsToWrite.adminOptions["MAX_FACTION_HEROES"]) > 4)
+                if (optionsToWrite.MaxFactionHeroes > 4)
                 {
-                    optionsToWrite.adminOptions["MAX_FACTION_UNITS"] = "4";
+                    optionsToWrite.MaxFactionHeroes = 4;
                 }
                 
             }
@@ -173,7 +180,7 @@ namespace GwentApp.Controllers
         /// </summary>
         /// <param name="fileContents"></param>
         /// <returns></returns>
-        public AppOptions ReadAppOptions(string fileContents)
+        public static AppOptions ReadAppOptions(string fileContents)
         {
             AppOptions currentOptions = new AppOptions();
             try
@@ -184,7 +191,7 @@ namespace GwentApp.Controllers
             catch
             {
                 currentOptions = new AppOptions();
-                currentOptions.adminOptions = new Dictionary<string, string>();
+                //currentOptions.adminOptions = new Dictionary<string, string>();
             }
             return currentOptions;
         }
