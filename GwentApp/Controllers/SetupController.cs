@@ -91,140 +91,67 @@ namespace GwentApp.Controllers
                 //Weather
                 List<Card> allWeatherCards = new List<Card>();
                 allWeatherCards.AddRange((Global.gAllCards.FindAll(c => c.Range.ToString().Trim() == Global.gAppOptions.WeatherIdentifier)).ToList<Card>());
-                while (allWeatherCards.Count > Global.gAppOptions.MaxWeatherCards)
-                {
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, allWeatherCards.Count);
-                    allWeatherCards.RemoveAt(rand);
-                }
+                allWeatherCards = Shuffle(allWeatherCards);
 
                 //Neutral Units
                 List<Card> allNeutralUnits = new List<Card>();
                 allNeutralUnits.AddRange((Global.gAllCards.FindAll(c => (c.Faction.ToString().Trim() == Global.gAppOptions.NeutralIdentifier && c.Hero == false && c.Range.ToString().Trim() != Global.gAppOptions.WeatherIdentifier))).ToList<Card>());
-                while (allNeutralUnits.Count > Global.gAppOptions.MaxNeutralUnits)
-                {
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, allNeutralUnits.Count);
-                    allNeutralUnits.RemoveAt(rand);
-                }
+                allNeutralUnits = Shuffle(allNeutralUnits);
 
                 //Neutral Heroes
                 List<Card> allNeutralHeroes = new List<Card>();
                 allNeutralHeroes.AddRange((Global.gAllCards.FindAll(c => (c.Faction.ToString().Trim() == Global.gAppOptions.NeutralIdentifier && c.Hero == true))).ToList<Card>());
-                while (allNeutralHeroes.Count > Global.gAppOptions.MaxNeutralHeroes)
-                {
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, allNeutralHeroes.Count);
-                    allNeutralHeroes.RemoveAt(rand);
-                }
+                allNeutralHeroes = Shuffle(allNeutralHeroes);
 
                 //Neutral Specials
                 List<Card> allNeutralSpecials = new List<Card>();
                 allNeutralSpecials.AddRange((Global.gAllCards.FindAll(c => ((c.Range.ToString().Trim() != Global.gAppOptions.CloseIdentifier) && (c.Range.ToString().Trim() != Global.gAppOptions.RangedIdentifier) && (c.Range.ToString().Trim() != Global.gAppOptions.SiegeIdentifier) && (c.Range.ToString().Trim() != Global.gAppOptions.WeatherIdentifier)))).ToList<Card>());
-                while (allNeutralSpecials.Count > Global.gAppOptions.MaxNeutralSpecials)
-                {
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, allNeutralSpecials.Count);
-                    allNeutralSpecials.RemoveAt(rand);
-                }
+                allNeutralSpecials = Shuffle(allNeutralSpecials);
 
                 //Faction Units
                 List<Card> allFactionUnits = new List<Card>();
                 allFactionUnits.AddRange((Global.gAllCards.FindAll(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr && c.Hero == false)).ToList<Card>());
-                while (allFactionUnits.Count > Global.gAppOptions.MaxFactionUnits)
-                {
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, allFactionUnits.Count);
-                    allFactionUnits.RemoveAt(rand);
-                }
+                allFactionUnits = Shuffle(allFactionUnits);
 
                 //Faction Heroes
                 List<Card> allFactionHeroes = new List<Card>();
                 allFactionHeroes.AddRange((Global.gAllCards.FindAll(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr && c.Hero == true)).ToList<Card>());
-                while (allFactionHeroes.Count > Global.gAppOptions.MaxFactionHeroes)
-                {
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, allFactionHeroes.Count);
-                    allFactionHeroes.RemoveAt(rand);
-                }
+                allFactionHeroes = Shuffle(allFactionHeroes);
 
-                //Add the pared down cards to the start deck
+                //Add the shuffled cards to the start deck, selecting only the amount specified in the appoptions config file
                 player.Deck = new List<Card>();
-                player.Deck.AddRange(allFactionHeroes);
-                player.Deck.AddRange(allFactionUnits);
-                player.Deck.AddRange(allNeutralHeroes);
-                player.Deck.AddRange(allNeutralUnits);
-                player.Deck.AddRange(allNeutralSpecials);
-                player.Deck.AddRange(allWeatherCards);
-                //Shuffle here!!!
-                List<Card> tempDeck = new List<Card>();
-                while (player.Deck.Count > 0)
-                {
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, player.Deck.Count);
-                    tempDeck.Add(player.Deck[rand]);
-                    player.Deck.RemoveAt(rand);
-                }
-                try
-                {
-                    player.Deck.RemoveRange(0, player.Deck.Count);
-                }
-                catch { }
-                player.Deck.AddRange(tempDeck);
+                player.Deck.AddRange(allFactionHeroes.GetRange(0, Global.gAppOptions.MaxFactionHeroes));
+                player.Deck.AddRange(allFactionUnits.GetRange(0, Global.gAppOptions.MaxFactionUnits));
+                player.Deck.AddRange(allNeutralHeroes.GetRange(0, Global.gAppOptions.MaxNeutralHeroes));
+                player.Deck.AddRange(allNeutralUnits.GetRange(0, Global.gAppOptions.MaxNeutralUnits));
+                player.Deck.AddRange(allNeutralSpecials.GetRange(0, Global.gAppOptions.MaxNeutralSpecials));
+                player.Deck.AddRange(allWeatherCards.GetRange(0, Global.gAppOptions.MaxNeutralSpecials));
+                
 
                 //Build the start deck
                 //This is the initial draw the player starts with
                 player.StartDeck = new List<Card>();
                 //Stack the deck with Min Faction Units
-                //temp list to store the findall
+                //Create a list to store the faction search results
                 List<Card> factionSearchResults = new List<Card>();
                 factionSearchResults = (player.Deck.FindAll(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr)).ToList<Card>();
-                //Chosen card list
-                List<Card> chosenCards = new List<Card>();
+                factionSearchResults = Shuffle(factionSearchResults);
+                //Add the MinFactionUnits to the start deck
                 for (int f = 0; f < Global.gAppOptions.MinFactionUnits; f++)
                 {
+                    Card c = new Card();
+                    c = factionSearchResults[f];
+                    player.StartDeck.Add(c);
+                    player.Deck.Remove(c);  
 
-                    ////////////////////////////////////
-                    //make a list
-
-                    //pull a random card
-                    //add to player.deck
-                    //remove it from the player.deck                    
-                    //make a list
-                    ////////////////////////////////////
-                    factionSearchResults = (player.Deck.FindAll(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr)).ToList<Card>();
-
-                    //search and find a faction unit
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, factionSearchResults.Count);
-                    Card factionCard = factionSearchResults[rand];
-                    player.StartDeck.Add(factionCard);
-                    player.Deck.Remove(factionCard);
-
-                    ////////////////////////////////////
-                    //OR
-                    //make a list<card> to store the chosen cards
-                    //select a random index from player.deck
-                    //add the CARD object to the chosen card list
-                    //loop the chosen list and 
-                    //add to player.startdeck
-                    //remove from player.deck
-                    ////////////////////////////////////
-                    //Random rnd = new Random();
-                    //int rand = rnd.Next(0, factionSearchResults.Count);
-                    //chosenCards.Add(factionSearchResults[rand]);
                 }
-                //foreach (Card c in chosenCards)
-                //{
-                //    player.StartDeck.Add(c);
-                //    player.Deck.Remove(c);
-                //}
-                while (player.StartDeck.Count < Global.gAppOptions.StartingDeckSize)
+                //Shuffle the player deck
+                player.Deck = Shuffle(player.Deck);
+                //don't pick randomly, just deal top StartingDeckSize-MinFactionUnits from shuffled deck above
+                for (int deal =0; deal < (Global.gAppOptions.StartingDeckSize - Global.gAppOptions.MinFactionUnits); deal++)
                 {
-                    Random rnd = new Random();
-                    int rand = rnd.Next(0, player.Deck.Count);
-                    player.StartDeck.Add(player.Deck[rand]);
-                    player.Deck.RemoveAt(rand);
+                    player.StartDeck.Add(player.Deck[deal]);
+                    player.Deck.RemoveAt(deal);
                 }
                 
                 //Sort the deck based on card range (close, range, siege). This is because im neurotic.
@@ -247,6 +174,21 @@ namespace GwentApp.Controllers
             ADUser user = new ADUser(ad, ad.GetGUIDBySAMAccountName(User.Identity.Name));
             
             return View(user);
+        }
+
+        public List<Card> Shuffle (List<Card> DeckToShuffle)
+        {
+            Card tempCard = new Card();
+            Random r = new Random();
+            int randomNumber;
+            for (int i = DeckToShuffle.Count - 1; i > 0; i--)
+            {
+                randomNumber = r.Next(0, i + 1);
+                tempCard = DeckToShuffle[i];
+                DeckToShuffle[i] = DeckToShuffle[randomNumber];
+                DeckToShuffle[randomNumber] = tempCard;
+            }
+            return DeckToShuffle;
         }
     }
 }

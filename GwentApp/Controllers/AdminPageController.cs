@@ -93,7 +93,7 @@ namespace GwentApp.Controllers
                 //Max number of faction unit cards to be dealt
                 defaultOptions.MaxFactionUnits = 12;
                 //Min number of faction units to be included in deck.
-                defaultOptions.MinFactionUnits = 4;
+                defaultOptions.MinFactionUnits = 2;
 
                 //Define SQL query constants. These work off of existing views in the database.
                 //Get all weather cards
