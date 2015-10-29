@@ -7,13 +7,6 @@
 <h2>Admin Page</h2>
 @using (@Html.BeginForm("UpdateAppOptions", "AdminPage"))
 {
-    @*foreach (KeyValuePair<string, string> i in Model.adminOptions)
-    {
-
-        @Html.Label(i.Key) <br />
-        @Html.EditorFor(v => v.adminOptions[i.Key]) <br />
-        
-    }*@
     @Html.LabelFor(o => o.MaxDeckSize) <br />
     @Html.EditorFor(o => o.MaxDeckSize) <br />
     @Html.LabelFor(o => o.StartingDeckSize) <br />

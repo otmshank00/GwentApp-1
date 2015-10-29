@@ -156,6 +156,21 @@ namespace GwentApp.Controllers
                 player.Deck.AddRange(allNeutralUnits);
                 player.Deck.AddRange(allNeutralSpecials);
                 player.Deck.AddRange(allWeatherCards);
+                //Shuffle here!!!
+                List<Card> tempDeck = new List<Card>();
+                while (player.Deck.Count > 0)
+                {
+                    Random rnd = new Random();
+                    int rand = rnd.Next(0, player.Deck.Count);
+                    tempDeck.Add(player.Deck[rand]);
+                    player.Deck.RemoveAt(rand);
+                }
+                try
+                {
+                    player.Deck.RemoveRange(0, player.Deck.Count);
+                }
+                catch { }
+                player.Deck.AddRange(tempDeck);
 
                 //Build the start deck
                 //This is the initial draw the player starts with
@@ -164,6 +179,8 @@ namespace GwentApp.Controllers
                 //temp list to store the findall
                 List<Card> factionSearchResults = new List<Card>();
                 factionSearchResults = (player.Deck.FindAll(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr)).ToList<Card>();
+                //Chosen card list
+                List<Card> chosenCards = new List<Card>();
                 for (int f = 0; f < Global.gAppOptions.MinFactionUnits; f++)
                 {
 
@@ -174,7 +191,7 @@ namespace GwentApp.Controllers
                     //add to player.deck
                     //remove it from the player.deck                    
                     //make a list
-
+                    ////////////////////////////////////
                     factionSearchResults = (player.Deck.FindAll(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr)).ToList<Card>();
 
                     //search and find a faction unit
@@ -183,7 +200,25 @@ namespace GwentApp.Controllers
                     Card factionCard = factionSearchResults[rand];
                     player.StartDeck.Add(factionCard);
                     player.Deck.Remove(factionCard);
+
+                    ////////////////////////////////////
+                    //OR
+                    //make a list<card> to store the chosen cards
+                    //select a random index from player.deck
+                    //add the CARD object to the chosen card list
+                    //loop the chosen list and 
+                    //add to player.startdeck
+                    //remove from player.deck
+                    ////////////////////////////////////
+                    //Random rnd = new Random();
+                    //int rand = rnd.Next(0, factionSearchResults.Count);
+                    //chosenCards.Add(factionSearchResults[rand]);
                 }
+                //foreach (Card c in chosenCards)
+                //{
+                //    player.StartDeck.Add(c);
+                //    player.Deck.Remove(c);
+                //}
                 while (player.StartDeck.Count < Global.gAppOptions.StartingDeckSize)
                 {
                     Random rnd = new Random();
