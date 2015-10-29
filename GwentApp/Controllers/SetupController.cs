@@ -161,14 +161,29 @@ namespace GwentApp.Controllers
                 //This is the initial draw the player starts with
                 player.StartDeck = new List<Card>();
                 //Stack the deck with Min Faction Units
+                //temp list to store the findall
+                List<Card> factionSearchResults = new List<Card>();
+                factionSearchResults = (player.Deck.FindAll(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr)).ToList<Card>();
                 for (int f = 0; f < Global.gAppOptions.MinFactionUnits; f++)
                 {
+
+                    ////////////////////////////////////
+                    //make a list
+
+                    //pull a random card
+                    //add to player.deck
+                    //remove it from the player.deck                    
+                    //make a list
+
+                    factionSearchResults = (player.Deck.FindAll(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr)).ToList<Card>();
+
                     //search and find a faction unit
-                    Card factionCard = player.Deck.Find(c => c.Faction.ToString().Trim() == player.Faction.FactionAbbr);
+                    Random rnd = new Random();
+                    int rand = rnd.Next(0, factionSearchResults.Count);
+                    Card factionCard = factionSearchResults[rand];
                     player.StartDeck.Add(factionCard);
                     player.Deck.Remove(factionCard);
                 }
-                //for (int index = 0; index < (Global.gAppOptions.StartingDeckSize-Global.gAppOptions.MinFactionUnits); index++)
                 while (player.StartDeck.Count < Global.gAppOptions.StartingDeckSize)
                 {
                     Random rnd = new Random();
