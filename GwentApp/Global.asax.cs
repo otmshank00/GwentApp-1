@@ -16,14 +16,6 @@ using GwentApp.Models;
 using Newtonsoft.Json;
 using GwentApp.Controllers;
 
-//redo the app options to be proper properties
-//read the app options here
-//read the entire data base here into a list
-//create the global individual lists for each faction, weather, special
-//reference these globals in the create deck method
-
- //sdfdsfsdfsdsdfsdf
-
 namespace GwentApp
 {
     public class Global : HttpApplication

@@ -5,10 +5,40 @@
 }
 @*Create a simple list items block to display what we got from the selected leader and faction*@
 <h2>Player Deck</h2>
-<li>@Model.Faction.FactionName</li>
-<li>@Model.Faction.FactionAbbr</li>
-<li>@Model.Leader.LeaderName</li>
-<li>@Model.Leader.LeaderFactionAbbr</li>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayName("Faction Name")
+        </th>
+        <th>
+            @Html.DisplayName("Faction Perk")
+        </th>
+    </tr>
+    <tr>
+        <td>
+            @Html.DisplayFor(m => m.Faction.FactionName)
+        </td>
+        <td>
+            @Html.DisplayFor(m => m.Faction.FactionPerk)
+        </td>
+    </tr>
+    <tr>
+        <th>
+            @Html.DisplayName("Leader Name")
+        </th>
+        <th>
+            @Html.DisplayName("Leader Ability")
+        </th>
+    </tr>
+    <tr>
+        <td>
+            @Html.DisplayFor(m => m.Leader.LeaderName)
+        </td>
+        <td>
+            @Html.DisplayFor(m => m.Leader.LeaderAbility)
+        </td>
+    </tr>
+</table>
 <table class="table">
     <tr>
         <th>
@@ -33,8 +63,7 @@
             @Html.DisplayName("Hero")
         </th>
     </tr>
-    @*Loop through the completed card deck to show what's there.
-    I still need to pare down to STARTING_DECK_SIZE but that's later*@
+    @*Loop through the completed card deck to show what's there.*@
     @foreach (Card c in Model.StartDeck)
     {
         //Nifty bit of conditional formatting here. If the card is a hero then the table row is gold.
