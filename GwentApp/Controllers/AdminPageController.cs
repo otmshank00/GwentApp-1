@@ -15,12 +15,7 @@ namespace GwentApp.Controllers
         public ActionResult Index()
         {
             //Create options object
-            //AppOptions appOptions = new AppOptions();
-            //appOptions.adminOptions = new Dictionary<string, string>();
-
-            //Use Global?
             Global.gAppOptions = new AppOptions();
-            //Global.gAppOptions.adminOptions = new Dictionary<string, string>();
 
             //Check for existance of config file
             //Yet another sanity check. Redundant code is redundant but this will be sure that we don't end up with no config.
@@ -48,12 +43,9 @@ namespace GwentApp.Controllers
                 bool recreateSuccess = WriteOptions(Global.gwentAppConfig.FilePath, null, true);
                 if (recreateSuccess)
                 {
-                    //appOptions = ReadAppOptions(Global.gwentAppConfig.Value);
-                    //Global?
                     Global.gAppOptions = ReadAppOptions(Global.gwentAppConfig.Value);
                 }
             }
-            //Global?
             return View(Global.gAppOptions);
         }
 

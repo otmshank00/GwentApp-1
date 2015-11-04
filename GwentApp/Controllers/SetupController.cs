@@ -80,6 +80,10 @@ namespace GwentApp.Controllers
             player.Faction.FactionAbbr = player.Leader.LeaderFactionAbbr;
             //Since the drop down list only sends the value (and not the text) I have to query the list to determine what faction name the selected leader belongs to
             player.Faction.FactionName = Player.DdFactionList.Find(i => i.Value == player.Faction.FactionAbbr).Text;
+            //Assign faction perk to player model
+            player.Faction.FactionPerk = Global.gAllFactions.Find(i => i.FactionAbbr == player.Faction.FactionAbbr).FactionPerk;
+            //Assign leader ability to player model
+            player.Leader.LeaderAbility = Global.gAllLeaders.Find(i => i.LeaderName == player.Leader.LeaderName).LeaderAbility;
             //This is a place holder of the faction abbreviation used in the SQL queries.
             string factionAbbreviation = player.Faction.FactionAbbr;
             try
