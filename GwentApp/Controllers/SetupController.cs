@@ -17,6 +17,12 @@ namespace GwentApp.Controllers
 {
     public class SetupController : Controller
     {
+        // GET: Setup/ApiExamples
+        public ActionResult ApiExamples()
+        {
+            return View();
+        }
+
         // GET: Setup/Index
         public ActionResult Index()
         {
