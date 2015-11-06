@@ -168,7 +168,7 @@ namespace GwentApp
                         Card card = new Card();
                         try
                         {
-                            card.Name = (string)row["cardName"];
+                            card.Name = ((string)row["cardName"]).Trim();
                         }
                         catch
                         { }
@@ -179,12 +179,12 @@ namespace GwentApp
                         catch { }
                         try
                         {
-                            card.Faction = (string)row["cardFaction"];
+                            card.Faction = ((string)row["cardFaction"]).Trim();
                         }
                         catch { }
                         try
                         {
-                            card.Quote = (string)row["cardQuote"];
+                            card.Quote = ((string)row["cardQuote"]).Trim();
                         }
                         catch { }
                         try
@@ -194,17 +194,17 @@ namespace GwentApp
                         catch { }
                         try
                         {
-                            card.Range = (string)row["cardRange"];
+                            card.Range = ((string)row["cardRange"]).Trim();
                         }
                         catch { }
                         try
                         {
-                            card.Ability = (string)row["cardAbilities"];
+                            card.Ability = ((string)row["cardAbilities"]).Trim();
                         }
                         catch { }
                         try
                         {
-                            card.Quote = (string)row["cardQuote"];
+                            card.Quote = ((string)row["cardQuote"]).Trim();
                         }
                         catch { }
                         //New logic to read image file from DB and build path. ImageFilePath

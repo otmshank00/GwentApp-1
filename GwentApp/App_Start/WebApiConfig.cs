@@ -46,7 +46,25 @@ namespace GwentApp
                 routeTemplate: "card/power/{power}",
                 defaults: new { controller = "Card", action = "GetByPower" }
             );
+            
+            config.Routes.MapHttpRoute(
+                name: "GetLeadersByFactionAbbreviationService",
+                routeTemplate: "card/leaders/byfaction/{factionAbbreviation}",
+                defaults: new { controller = "Card", action= "GetLeadersByFactionAbbreviation" }
+            );
 
+            config.Routes.MapHttpRoute(
+                name: "GetLeaderByNameService",
+                routeTemplate: "card/leaders/byname/{leaderName}",
+                defaults: new { controller = "Card", action = "GetLeaderByName" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "BuildDeckByFactionService",
+                routeTemplate: "card/builddeck/byfaction/{factionAbbreviation}",
+                defaults: new { controller = "Card", action = "BuildDeckByFaction" }
+            );
+            
             // Web API routes
             config.MapHttpAttributeRoutes();
 
