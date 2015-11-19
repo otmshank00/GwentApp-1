@@ -63,5 +63,9 @@ namespace GwentApp.Models
         {
             get; set;
         }
+        //Data for gameplay
+        bool MyTrun;
+        int WinCount;
+        int RivalScore;
     }
 }
