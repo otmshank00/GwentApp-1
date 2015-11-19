@@ -64,8 +64,20 @@ namespace GwentApp.Models
             get; set;
         }
         //Data for gameplay
-        bool MyTrun;
-        int WinCount;
-        int RivalScore;
+        //Is it currently your turn?
+        public bool MyTurn
+        {
+            get; set;
+        }
+        //Current number of wins
+        public int WinCount
+        {
+            get; set;
+        }
+        //Other players current score
+        public int RivalScore
+        {
+            get; set;
+        }
     }
 }
