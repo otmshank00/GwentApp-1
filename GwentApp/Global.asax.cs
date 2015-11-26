@@ -57,8 +57,21 @@ namespace GwentApp
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
-            // Setup an AD client.
-            ad = new ActiveDirectory(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME);
+            try { 
+                // Setup an AD client.
+                ad = new ActiveDirectory(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME);
+            }
+            catch (System.ArgumentNullException ex)
+            {
+                //If the file doesn't exist, or if it's 0 bytes. Note that as of this writing, a 0-byte file will be created if it does not already exist.
+                //System.IO.FileNotFoundException might be a better fit...
+                Console.WriteLine("The file {0}{1}, does not exist, please create it in Astrolabe from the template template.{1}, exception is: {2}", CONFIG_ITEM_DIRECTORY, ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME, ex.Source);
+            }
+            catch (System.ArgumentException ex)
+            {
+                //Hits here if the info in ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME was not valid.
+                Console.WriteLine("There was a problem with your AD config file {0}{1}, please create it in Astrolabe from the template template.{1}, exception is: {2}", CONFIG_ITEM_DIRECTORY, ACTIVE_DIRECTORY_CONFIGURATION_ITEM_NAME, ex.Source);
+            }
 
             // Get our SQL connection string.
             ConfigurationItem sqlConfig = new ConfigurationItem(HostingEnvironment.MapPath(CONFIG_ITEM_DIRECTORY), DB_CONFIGURATION_ITEM_NAME, true);
