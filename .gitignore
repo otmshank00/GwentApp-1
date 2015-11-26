@@ -5,7 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
-ActiveDirectory.config
+GwentApp/ConfigurationItems/ActiveDirectory.config
 .vs/config/applicationhost.config
 
 # Build results
