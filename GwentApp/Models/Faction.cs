@@ -26,5 +26,10 @@ namespace GwentApp.Models
         {
             get; set;
         }
+        //The faction id from database
+        public int FactionId
+        {
+            get; set;
+        }
     }
 }

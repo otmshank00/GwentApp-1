@@ -16,6 +16,17 @@ using GwentApp.Models;
 using Newtonsoft.Json;
 using GwentApp.Controllers;
 
+//11-20 to do
+//write board model
+//write methods to handle
+//-card play
+//-round total
+//-game total
+//-pass action
+//-leader power
+//-faction perk
+//write as a web service. return a serialzed json
+
 namespace GwentApp
 {
     public class Global : HttpApplication
@@ -142,6 +153,7 @@ namespace GwentApp
                         faction.FactionName = ((string)row["factionName"]).Trim();
                         faction.FactionAbbr = ((string)row["factionAbbreviation"]).Trim();
                         faction.FactionPerk = ((string)row["factionPerk"]).Trim();
+                        faction.FactionId = ((int)row["Id"]);
                         gAllFactions.Add(faction);
                     }
                 }
@@ -156,6 +168,7 @@ namespace GwentApp
                         leader.LeaderAbility = ((string)row["leaderAbility"]).Trim();
                         leader.LeaderFaction = ((string)row["leaderFaction"]).Trim();
                         leader.LeaderFactionAbbr = ((string)row["leaderFactionAbbreviation"]);
+                        leader.LeaderId = ((int)row["Id"]);
                         gAllLeaders.Add(leader);
                     }
                 }
@@ -166,6 +179,12 @@ namespace GwentApp
                     foreach (SqlRow row in allCardsRows)
                     {
                         Card card = new Card();
+                        //Read in card ID
+                        try
+                        {
+                            card.CardId = ((int)row["Id"]);
+                        }
+                        catch { }
                         try
                         {
                             card.Name = ((string)row["cardName"]).Trim();

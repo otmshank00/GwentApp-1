@@ -39,6 +39,7 @@ namespace GwentApp.Controllers
             Player.DdFactionList = new List<SelectListItem>();
             Player.DdLeaderList = new List<SelectListItem>();
             SelectListItem item = new SelectListItem();
+            Global.gAppOptions = GwentApp.Controllers.AdminPageController.ReadAppOptions(Global.gwentAppConfig.Value);
 
             //ADD LEADERS AND FACTIONS TO PLAYER INFO
             //Add the drop down list item. Note that the TEXT property is not passed, only the VALUE. This causes pain.
@@ -98,33 +99,19 @@ namespace GwentApp.Controllers
                 player.Deck = BuildDeck(factionAbbreviation);
                 //Build the start deck
                 //This is the initial draw the player starts with
-                player.StartDeck = new List<Card>();
-                //Stack the deck with Min Faction Units
-                //Create a list to store the faction search results
-                List<Card> factionSearchResults = new List<Card>();
-                factionSearchResults = (player.Deck.FindAll(c => c.Faction == player.Faction.FactionAbbr)).ToList<Card>();
-                factionSearchResults = Shuffle(factionSearchResults);
-                //Add the MinFactionUnits to the start deck
-                for (int f = 0; f < Global.gAppOptions.MinFactionUnits; f++)
+                player.Hand = new List<Card>();
+                //Moved to function
+                player.Hand = DealHand(player.Deck, player.Faction.FactionAbbr);
+
+                //You need to remove the hand cards from the deck
+                foreach (Card c in player.Hand)
                 {
-                    Card c = new Card();
-                    c = factionSearchResults[f];
-                    player.StartDeck.Add(c);
                     player.Deck.Remove(c);
-
-                }
-                //Shuffle the player deck
-                player.Deck = Shuffle(player.Deck);
-                //don't pick randomly, just deal top StartingDeckSize-MinFactionUnits from shuffled deck above
-                for (int deal = 0; deal < (Global.gAppOptions.StartingDeckSize - Global.gAppOptions.MinFactionUnits); deal++)
-                {
-                    player.StartDeck.Add(player.Deck[deal]);
-                    player.Deck.RemoveAt(deal);
                 }
 
-                //Sort the deck based on card range (close, range, siege). This is because im neurotic.
-                player.Deck.Sort((x, y) => string.Compare(x.Range, y.Range));
-                player.StartDeck.Sort((x, y) => string.Compare(x.Range, y.Range));
+                //Sort the Hand based on card range (close, range, siege). This is because im neurotic.
+                //player.Deck.Sort((x, y) => string.Compare(x.Range, y.Range));
+                player.Hand.Sort((x, y) => string.Compare(x.Range, y.Range));
 
             }
             catch (Exception err)
@@ -157,6 +144,34 @@ namespace GwentApp.Controllers
                 DeckToShuffle[randomNumber] = tempCard;
             }
             return DeckToShuffle;
+        }
+
+        public static List<Card> DealHand(List<Card> startDeck, string factionAbbreviation)
+        {
+            List<Card> dealtHand = new List<Card>();
+            List<Card> factionSearchResults = new List<Card>();
+            //Stack the deck with Min Faction Units
+            //Create a list to store the faction search results
+            factionSearchResults = (startDeck.FindAll(c => c.Faction == factionAbbreviation)).ToList<Card>();
+            factionSearchResults = Shuffle(factionSearchResults);
+            //Add the MinFactionUnits to the start deck
+            for (int f = 0; f < Global.gAppOptions.MinFactionUnits; f++)
+            {
+                Card c = new Card();
+                c = factionSearchResults[f];
+                dealtHand.Add(c);
+                startDeck.Remove(c);
+
+            }
+            //Shuffle the player deck
+            startDeck = Shuffle(startDeck);
+            //don't pick randomly, just deal top StartingDeckSize-MinFactionUnits from shuffled deck above
+            for (int deal = 0; deal < (Global.gAppOptions.StartingDeckSize - Global.gAppOptions.MinFactionUnits); deal++)
+            {
+                dealtHand.Add(startDeck[deal]);
+                //player.Deck.RemoveAt(deal);
+            }
+            return dealtHand;
         }
 
         public static List<Card> BuildDeck(string factionAbbreviation)
@@ -202,22 +217,28 @@ namespace GwentApp.Controllers
             allFactionHeroes = Shuffle(allFactionHeroes);
 
             //Add the shuffled cards to the start deck, selecting only the amount specified in the appoptions config file
-            //player.Deck = new List<Card>();
-            //player.Deck.AddRange(allFactionHeroes.GetRange(0, Global.gAppOptions.MaxFactionHeroes));
-            //player.Deck.AddRange(allFactionUnits.GetRange(0, Global.gAppOptions.MaxFactionUnits));
-            //player.Deck.AddRange(allNeutralHeroes.GetRange(0, Global.gAppOptions.MaxNeutralHeroes));
-            //player.Deck.AddRange(allNeutralUnits.GetRange(0, Global.gAppOptions.MaxNeutralUnits));
-            //player.Deck.AddRange(allNeutralSpecials.GetRange(0, Global.gAppOptions.MaxNeutralSpecials));
-            //player.Deck.AddRange(allWeatherCards.GetRange(0, Global.gAppOptions.MaxNeutralSpecials));
-
             builtDeck.AddRange(allFactionHeroes.GetRange(0, Global.gAppOptions.MaxFactionHeroes));
             builtDeck.AddRange(allFactionUnits.GetRange(0, Global.gAppOptions.MaxFactionUnits));
             builtDeck.AddRange(allNeutralHeroes.GetRange(0, Global.gAppOptions.MaxNeutralHeroes));
             builtDeck.AddRange(allNeutralUnits.GetRange(0, Global.gAppOptions.MaxNeutralUnits));
             builtDeck.AddRange(allNeutralSpecials.GetRange(0, Global.gAppOptions.MaxNeutralSpecials));
             builtDeck.AddRange(allWeatherCards.GetRange(0, Global.gAppOptions.MaxNeutralSpecials));
-
-
+            //So what if our max deck requirement is not met?
+            if (builtDeck.Count < Global.gAppOptions.MaxDeckSize)
+            {
+                List<Card> spilloverUnits = new List<Card>();
+                allFactionUnits.RemoveRange(0, Global.gAppOptions.MaxFactionUnits);
+                allFactionHeroes.RemoveRange(0, Global.gAppOptions.MaxFactionHeroes);
+                allNeutralSpecials.RemoveRange(0, Global.gAppOptions.MaxNeutralSpecials);
+                allNeutralUnits.RemoveRange(0, Global.gAppOptions.MaxNeutralUnits);
+                spilloverUnits.AddRange(allFactionUnits.GetRange(0, allFactionUnits.Count));
+                spilloverUnits.AddRange(allFactionHeroes.GetRange(0, allFactionHeroes.Count));
+                spilloverUnits.AddRange(allNeutralSpecials.GetRange(0, allNeutralSpecials.Count));
+                spilloverUnits.AddRange(allNeutralUnits.GetRange(0, allNeutralUnits.Count));
+                spilloverUnits = Shuffle(spilloverUnits);
+                builtDeck.AddRange(spilloverUnits.GetRange(0, (Global.gAppOptions.MaxDeckSize - builtDeck.Count)));
+            }
+            
 
             //////////////
             //End Copy

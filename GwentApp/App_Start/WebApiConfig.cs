@@ -7,8 +7,10 @@ using System.Web.Http.Cors;
 
 namespace GwentApp
 {
+   
     public static class WebApiConfig
     {
+        [AllowAnonymous]
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
@@ -17,16 +19,23 @@ namespace GwentApp
             config.Formatters.Clear();
             config.Formatters.Add(new JsonMediaTypeFormatter());
             config.Formatters.JsonFormatter.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
-
+            
             // Enable CORS.
             config.EnableCors();
 
             // Custom routes for Card API Controller
-
+            
             config.Routes.MapHttpRoute(
                 name: "GetAllCardsService",
                 routeTemplate: "card/all",
                 defaults: new { controller = "Card", action = "GetAllCards" }
+            );
+
+            //New for playable logic. This will run when a user clicks a card to get it's details and play it
+            config.Routes.MapHttpRoute(
+                name: "GetCardByIdService",
+                routeTemplate: "card/byid/{id}",
+                defaults: new { controller = "Card", action = "GetCardByID" }
             );
 
             config.Routes.MapHttpRoute(
@@ -64,7 +73,14 @@ namespace GwentApp
                 routeTemplate: "card/builddeck/byfaction/{factionAbbreviation}",
                 defaults: new { controller = "Card", action = "BuildDeckByFaction" }
             );
-            
+
+            //Return faction object based on abbreviation
+            config.Routes.MapHttpRoute(
+                name: "GetFactionByAbbreviationService",
+                routeTemplate: "card/getfaction/{factionAbbreviation}",
+                defaults: new { controller = "Card", action = "GetFactionByAbbreviation" }
+            );
+
             // Web API routes
             config.MapHttpAttributeRoutes();
 
