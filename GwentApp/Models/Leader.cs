@@ -31,5 +31,10 @@ namespace GwentApp.Models
         {
             get; set;
         }
+        //The database id for the leader
+        public int LeaderId
+        {
+            get; set;
+        }
     }
 }

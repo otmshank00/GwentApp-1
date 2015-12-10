@@ -1,0 +1,114 @@
+﻿@using GwentApp.Models;
+@model Player
+@{
+    ViewBag.Title = "BoardView";
+    //Player player = TempData["tempPlayer"] as Player;
+    Player player = Session[Model.PlayerGuid.ToString()] as Player;
+    string cardsInCloseRow = "";
+    string cardsInRangedRow = "";
+    string cardsInSiegeRow = "";
+    foreach (Card cc in player.PlayerBoardState.CloseCombat)
+    {
+        cardsInCloseRow += "|";
+        cardsInCloseRow += cc.Name;
+    }
+    foreach (Card rc in player.PlayerBoardState.RangedCombat)
+    {
+        cardsInRangedRow += "|";
+        cardsInRangedRow += rc.Name;
+    }
+    foreach (Card sc in player.PlayerBoardState.SiegeCombat)
+    {
+        cardsInSiegeRow += "|";
+        cardsInSiegeRow += sc.Name;
+    }
+}
+
+<h2>BoardView</h2>
+
+<table>
+    <tr>
+        <td>
+            @Html.Label("Round Number: ") @Html.DisplayFor(p => player.PlayerBoardState.RoundNumber)
+        </td>
+        <td>
+            @Html.Label("Win Count: ") @Html.DisplayFor(p => player.WinCount)
+        </td>
+    </tr>
+    <tr>
+        <td style="@(player.PlayerBoardState.IsSnowing ? " background-color:#00b4d2" : "")">
+        
+            @Html.DisplayFor(p => player.PlayerBoardState.CloseCombatTotal)
+        </td>
+        <td>
+            @Html.Label(cardsInCloseRow)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DisplayFor(p => player.PlayerBoardState.RangedCombatTotal)
+        </td>
+        <td>
+            @Html.Label(cardsInRangedRow)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.DisplayFor(p => player.PlayerBoardState.SiegeCombatTotal)
+        </td>
+        <td>
+            @Html.Label(cardsInSiegeRow)
+        </td>
+    </tr>
+    
+
+</table>
+@foreach (Card c in player.Hand)
+{
+    if (!(player.PlayerBoardState.Passed))
+    {
+        if (c.Name != "Commander's Horn")
+        {
+            <li style="@(c.Hero ? " background-color:#C27E3A" : "")">@Html.ActionLink(c.Name, "PlayCard", "Board", new { id = c.CardId }, null) | @Html.DisplayFor(p => c.Range) | @Html.DisplayFor(p => c.Power) | @Html.DisplayFor(p => c.Ability)</li>
+        }
+        else
+        {
+            <li>@Html.DisplayFor(p => c.Name) @Html.ActionLink("Close", "PlayCard", "Board", new { id = c.CardId, row = "Close" }, null) | @Html.ActionLink("Ranged", "PlayCard", "Board", new { id = c.CardId, row = "Ranged" }, null) | @Html.ActionLink("Siege", "PlayCard", "Board", new { id = c.CardId, row = "Siege" }, null)</li>
+        }
+    }
+    else
+    {
+        <li>@Html.DisplayFor(p => c.Name)</li>
+    }
+}
+
+<span>
+    <br />
+    @if (!(player.PlayerBoardState.Passed))
+    {
+        @Html.ActionLink("Pass", "PlayerPass", "Board", new { id = "" }, null)
+    }
+    else
+    {
+        @Html.Label("Round passed!");
+    }
+    &nbsp;|&nbsp;
+    @Html.ActionLink("Draw card (TESTING ONLY)", "DrawFromDeck", "Board", new { id = "" }, null)
+    &nbsp;|&nbsp;
+    @Html.ActionLink("Total Round", "RoundTotal", "Board", new { id = "" }, null)
+</span>
+
+@*@using (@Html.BeginForm("PlayCard", "Board"))
+{
+
+    //@Html.DropDownListFor(m => m.SelectedFaction.FactionAbbr, Player.DdFactionList, "");
+    @Html.DisplayFor(p => p.SelectedFaction.FactionName)
+
+    @Html.DropDownListFor(p => p.PlayerBoardState.PlayedCardId, cardDd, "")
+
+    <input type="submit" value="Submit" />
+}*@
+@{ 
+    //TempData["tempPlayer"] = player;
+    Session[player.PlayerGuid.ToString()] = player;
+}

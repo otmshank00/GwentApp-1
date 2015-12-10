@@ -71,5 +71,12 @@ namespace GwentApp.Models
         {
             get; set;
         }
+
+        //The card ID from the database
+        [DataMember]
+        public int CardId
+        {
+            get; set;
+        }
     }
 }

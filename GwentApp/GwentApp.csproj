@@ -357,16 +357,19 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Code\WebAPIIsLocalAttribute.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminPageController.cs" />
+    <Compile Include="Controllers\BoardController.cs" />
     <Compile Include="Controllers\CardController.cs" />
     <Compile Include="Controllers\SetupController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AppOptions.cs" />
+    <Compile Include="Models\BoardState.cs" />
     <Compile Include="Models\Card.cs" />
     <Compile Include="Models\Faction.cs" />
     <Compile Include="Models\Leader.cs" />
@@ -389,6 +392,8 @@
     <Content Include="Views\Setup\PlayerInfo.cshtml" />
     <Content Include="Views\AdminPage\Index.cshtml" />
     <Content Include="Views\Setup\ApiExamples.cshtml" />
+    <Content Include="Views\Board\Index.cshtml" />
+    <Content Include="Views\Board\BoardView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

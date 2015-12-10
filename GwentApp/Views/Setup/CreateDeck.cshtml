@@ -42,6 +42,9 @@
 <table class="table">
     <tr>
         <th>
+            @Html.DisplayName("Card ID")
+        </th>
+        <th>
             @Html.DisplayName("Image")
         </th>
         <th>
@@ -64,14 +67,19 @@
         </th>
     </tr>
     @*Loop through the completed card deck to show what's there.*@
-    @foreach (Card c in Model.StartDeck)
+    @foreach (Card c in Model.Hand)
     {
         //Nifty bit of conditional formatting here. If the card is a hero then the table row is gold.
         <tr style="@(c.Hero ? " background-color:#C27E3A" : "")">
             <td>
+                @*@Html.DisplayFor(x => c.CardId)*@
+                <a href="@Url.Content("~/card/byid/"+c.CardId)">@Html.DisplayFor(x => c.CardId)</a>
+            </td>
+            <td>
                 @*<img height="155" width="82" src="@Url.Content(c.ImageFilePath)" />*@
                 <a href="@Url.Content(c.ImageFilePath)"><img height="155" width="82" src="@Url.Content(c.ImageFilePath)" /></a>
             </td>
+            
             <td>
                 @Html.DisplayFor(x => c.Name)
             </td>

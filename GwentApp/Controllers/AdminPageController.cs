@@ -148,6 +148,14 @@ namespace GwentApp.Controllers
                 {
                     optionsToWrite.MaxFactionHeroes = 4;
                 }
+                if (optionsToWrite.MaxDeckSize > 50)
+                {
+                    optionsToWrite.MaxDeckSize = 50;
+                }
+                if (optionsToWrite.StartingDeckSize > optionsToWrite.MaxDeckSize)
+                {
+                    optionsToWrite.StartingDeckSize = optionsToWrite.MaxDeckSize;
+                }
                 
             }
             try
