@@ -139,39 +139,53 @@ namespace GwentApp.Controllers
         [HttpGet]       
         public ActionResult PlayCard(Player player, int id, string row)
         {
-            int closeHornModifier = 0;
-            int rangedHornModifier = 0;
-            int siegeHornModifier = 0;
+            int closeHornModifier = 2;
+            int rangedHornModifier = 2;
+            int siegeHornModifier = 2;
             player = Session[player.PlayerGuid.ToString()] as Player;
             int playedCardId = id;
             Card c = new Card();
-            List<Card> cl = new List<Card>();
-            //Create web client to do call
-            System.Net.WebClient client = new System.Net.WebClient();
-            //Create the url to pull from
-            string cardUriString = Url.RouteUrl("", new { action = "byid", controller = "Card", id = playedCardId }, Request.Url.Scheme);
-            //Get the card and deserialize
-            string cardReturn = client.DownloadString(cardUriString);
-            //c = JsonConvert.DeserializeObject(cardReturn);
-            cl = JsonConvert.DeserializeObject<List<Card>>(cardReturn);
-            c = cl[0];
+            c = GetCardFromAPI(playedCardId);
             switch (c.Range) //very much need to add weather and special effects
             { 
                 case "Ranged":
                     player.PlayerBoardState.RangedCombat.Add(c);
-                    player.PlayerBoardState.RangedCombatTotal += c.Power;
+                    if (player.PlayerBoardState.HornInRangedRow)
+                    {
+                        player.PlayerBoardState.RangedCombatTotal += c.Power * rangedHornModifier;
+                    }
+                    else
+                    {
+                        player.PlayerBoardState.RangedCombatTotal += c.Power;
+                    }
+                    //player.PlayerBoardState.RangedCombatTotal += c.Power;
                     player = ProcessCardAbility(c, player, "");
                     
                     break;
                 case "Close":
-                    
                     player.PlayerBoardState.CloseCombat.Add(c);
-                    player.PlayerBoardState.CloseCombatTotal += c.Power;
+                    if (player.PlayerBoardState.HornInCloseRow)
+                    {
+                        player.PlayerBoardState.CloseCombatTotal += c.Power * closeHornModifier;
+                    }
+                    else
+                    {
+                        player.PlayerBoardState.CloseCombatTotal += c.Power;
+                    }
+                    //player.PlayerBoardState.CloseCombatTotal += c.Power;
                     player = ProcessCardAbility(c, player, "");
                     break;
                 case "Siege":
                     player.PlayerBoardState.SiegeCombat.Add(c);
-                    player.PlayerBoardState.SiegeCombatTotal += c.Power;
+                    if (player.PlayerBoardState.HornInSiegeRow)
+                    {
+                        player.PlayerBoardState.SiegeCombatTotal += c.Power * siegeHornModifier;
+                    }
+                    else
+                    {
+                        player.PlayerBoardState.SiegeCombatTotal += c.Power;
+                    }
+                    //player.PlayerBoardState.SiegeCombatTotal += c.Power;
                     player = ProcessCardAbility(c, player, "");
                     break;
                 case "Weather":
@@ -235,18 +249,18 @@ namespace GwentApp.Controllers
             //Now process weather effects on ranges based on bool
             //Biting Frost-Sets NON HERO close combat cards to 1 power
 //TO DO            //Check the BOND
-//TO DO adding commanders horn to weather affected row doubles original value not weather value
+
             //sdsdsds
             if (player.PlayerBoardState.IsSnowing)
             {
-                if (player.PlayerBoardState.HornInCloseRow)
-                {
-                    closeHornModifier = 2;
-                }
-                else
-                {
-                    closeHornModifier = 1;
-                }
+                //if (player.PlayerBoardState.HornInCloseRow && (!(player.PlayerBoardState.IsSnowing)))
+                //{
+                //    closeHornModifier = 2;
+                //}
+                //else
+                //{
+                //    closeHornModifier = 1;
+                //}
                 int closeWeatherTotal = 0;
                 foreach (Card cc in player.PlayerBoardState.CloseCombat)
                 {
@@ -265,7 +279,7 @@ namespace GwentApp.Controllers
             //Impenetrable Fog-Sets NON HERO ranged combat cards to 1 power
             if (player.PlayerBoardState.IsFoggy)
             {
-                if (player.PlayerBoardState.HornInRangedRow)
+                if (player.PlayerBoardState.HornInRangedRow &&(!(player.PlayerBoardState.IsFoggy)))
                 {
                     rangedHornModifier = 2;
                 }
@@ -291,7 +305,7 @@ namespace GwentApp.Controllers
             //Torrential Rain-Sets NON HERO siege combat cards to 1 power
             if (player.PlayerBoardState.IsRaining)
             {
-                if (player.PlayerBoardState.HornInSiegeRow)
+                if (player.PlayerBoardState.HornInSiegeRow && (!(player.PlayerBoardState.IsRaining)))
                 {
                     siegeHornModifier = 2;
                 }
@@ -316,10 +330,12 @@ namespace GwentApp.Controllers
             ///////
 //TO DO            //BONDS ARE NOT RECALCULATED AFTER CLEAR WEATHER
             ///////
-            //sdfsdfds
+            //FIXED  PLAY X PWR CARD. FROST. HORN. CLEAR. CARD IS 4. WTELF?!?!?! Error is in process math for horn process ends up 2*2. Hence power 4
+
             if (player.PlayerBoardState.IsSnowing && c.Name == "Clear Weather")
             {
                 //int closeClearWeatherTotal = 0;
+                player.PlayerBoardState.IsSnowing = false;
                 List<Card> tempCc = new List<Card>();
                 tempCc.AddRange(player.PlayerBoardState.CloseCombat.GetRange(0, player.PlayerBoardState.CloseCombat.Count));
                 player.PlayerBoardState.CloseCombatTotal = 0;
@@ -331,11 +347,12 @@ namespace GwentApp.Controllers
                     player = ProcessCardAbility(cc, player, "");
                 }
                 //player.PlayerBoardState.CloseCombatTotal = closeClearWeatherTotal;
-                player.PlayerBoardState.IsSnowing = false;
+                
             }
 
             if (player.PlayerBoardState.IsFoggy && c.Name == "Clear Weather")
             {
+                player.PlayerBoardState.IsFoggy = false;
                 List<Card> tempRc = new List<Card>();
                 tempRc.AddRange(player.PlayerBoardState.RangedCombat.GetRange(0, player.PlayerBoardState.RangedCombat.Count));
                 player.PlayerBoardState.RangedCombatTotal = 0;
@@ -347,11 +364,12 @@ namespace GwentApp.Controllers
                     player = ProcessCardAbility(rc, player, "");
                 }
                 //player.PlayerBoardState.RangedCombatTotal = rangedClearWeatherTotal;
-                player.PlayerBoardState.IsFoggy = false;
+                
             }
 
             if (player.PlayerBoardState.IsRaining && c.Name == "Clear Weather")
             {
+                player.PlayerBoardState.IsRaining = false;
                 List<Card> tempSc = new List<Card>();
                 tempSc.AddRange(player.PlayerBoardState.SiegeCombat.GetRange(0, player.PlayerBoardState.SiegeCombat.Count));
                 player.PlayerBoardState.SiegeCombatTotal = 0;
@@ -363,7 +381,7 @@ namespace GwentApp.Controllers
                     player = ProcessCardAbility(sc, player, "");
                 }
                 //player.PlayerBoardState.SiegeCombatTotal = siegeClearWeatherTotal;
-                player.PlayerBoardState.IsRaining = false;
+                
             }
 
             //Session["Player"] = JsonConvert.SerializeObject(player);
@@ -404,7 +422,7 @@ namespace GwentApp.Controllers
                             {
                                 if (!(cc.Hero))
                                 {
-                                    if (player.PlayerBoardState.IsSnowing)
+                                    if (player.PlayerBoardState.IsSnowing && (cc.Power > 0))
                                     {
                                         hornCloseTotal += 1 * 2;
                                     }
@@ -428,7 +446,7 @@ namespace GwentApp.Controllers
                             {
                                 if (!(rc.Hero))
                                 {
-                                    if (player.PlayerBoardState.IsFoggy)
+                                    if (player.PlayerBoardState.IsFoggy && (rc.Power > 0))
                                     {
                                         hornRangedTotal += 1 * 2;
                                     }
@@ -452,7 +470,7 @@ namespace GwentApp.Controllers
                             {
                                 if (!(sc.Hero))
                                 {
-                                    if (player.PlayerBoardState.IsRaining)
+                                    if (player.PlayerBoardState.IsRaining && (sc.Power > 0))
                                     {
                                         hornSiegeTotal += 1 * 2;
                                     }
@@ -599,7 +617,6 @@ namespace GwentApp.Controllers
         public ActionResult DrawFromDeck()
         {
             Player player = new Player();
-            //player = TempData["tempPlayer"] as Player;
             player = Session[player.PlayerGuid.ToString()] as Player;
             Card drawnCard = new Card();
             if (player.Deck.Count > 0)
@@ -622,6 +639,35 @@ namespace GwentApp.Controllers
             return pool[0];
         }
 
+        public ActionResult AddCard(int id)
+        {
+            Player player = new Player();
+            player = Session[player.PlayerGuid.ToString()] as Player;
+            player.Hand.Add(GetCardFromAPI(id));
+            Session[player.PlayerGuid.ToString()] = player;
+            return Redirect("~/Board/BoardView/");
+        }
+
+        /// <summary>
+        /// Return a card from the API from its id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Card GetCardFromAPI(int id)
+        {
+            Card c = new Card();
+            List<Card> cl = new List<Card>();
+            //Create web client to do call
+            System.Net.WebClient client = new System.Net.WebClient();
+            //Create the url to pull from
+            string cardUriString = Url.RouteUrl("", new { action = "byid", controller = "Card", id = id }, Request.Url.Scheme);
+            //Get the card and deserialize
+            string cardReturn = client.DownloadString(cardUriString);
+            //c = JsonConvert.DeserializeObject(cardReturn);
+            cl = JsonConvert.DeserializeObject<List<Card>>(cardReturn);
+            c = cl[0];
+            return c;
+        }
         /// <summary>
         /// Builds the player deck and hand using web service calls and adds to the player model
         /// </summary>

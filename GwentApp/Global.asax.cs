@@ -27,6 +27,15 @@ using GwentApp.Controllers;
 //-faction perk
 //write as a web service. return a serialzed json
 
+//1-2016 to do
+//global list of players, key is player guid.
+//the player changes are updated.
+//lobby will match 2 guids together that are playing
+//store in session who is playing
+//have a way to track who is in game
+
+//build an AI player
+
 namespace GwentApp
 {
     public class Global : HttpApplication

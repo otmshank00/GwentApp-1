@@ -7,6 +7,7 @@
     string cardsInCloseRow = "";
     string cardsInRangedRow = "";
     string cardsInSiegeRow = "";
+    int cid = 1;
     foreach (Card cc in player.PlayerBoardState.CloseCombat)
     {
         cardsInCloseRow += "|";
@@ -96,6 +97,9 @@
     @Html.ActionLink("Draw card (TESTING ONLY)", "DrawFromDeck", "Board", new { id = "" }, null)
     &nbsp;|&nbsp;
     @Html.ActionLink("Total Round", "RoundTotal", "Board", new { id = "" }, null)
+    &nbsp;|&nbsp;
+    
+    @Html.TextBox("cardId") @Html.ActionLink("Add", "AddCard", "Board", new {  id = (int.TryParse("cardId", out cid))}, null)
 </span>
 
 @*@using (@Html.BeginForm("PlayCard", "Board"))
